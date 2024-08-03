@@ -99,7 +99,7 @@ pub mod multiple_tokens {
 
 #[derive(Accounts)]
 pub struct CreateLiquidityPool<'info> {
-    #[account(init, payer = initializer, space = 8 + LiquidityPool::INIT_SPACE)]
+    #[account(init, payer = initializer,seeds = ["liquidity_pool".as_bytes()], bump, space = 8 + LiquidityPool::INIT_SPACE)]
     pub liquidity_pool: Box<Account<'info, LiquidityPool>>,
     // #[account(init_if_needed, payer = initializer, associated_token::mint = token_a_mint, associated_token::authority = liquidity_pool)]
     // pub token_a_vault: Box<Account<'info, TokenAccount>>,
@@ -111,16 +111,16 @@ pub struct CreateLiquidityPool<'info> {
     // pub token_d_vault: Box<Account<'info, TokenAccount>>,
     // #[account(init_if_needed, payer = initializer, associated_token::mint = token_e_mint, associated_token::authority = liquidity_pool)]
     // pub token_e_vault: Box<Account<'info, TokenAccount>>,
-    #[account(init, payer = initializer, mint::decimals = 9, mint::authority = liquidity_pool)]
+    #[account(init, payer = initializer,seeds = ["lp_mint".as_bytes()], bump, mint::decimals = 9, mint::authority = lp_mint)]
     pub lp_mint: Box<Account<'info, Mint>>,
     #[account(mut)]
     pub initializer: Signer<'info>,
     
-    pub token_a_mint: Box<Account<'info, Mint>>,
-    pub token_b_mint: Box<Account<'info, Mint>>,
-    pub token_c_mint: Box<Account<'info, Mint>>,
-    pub token_d_mint: Box<Account<'info, Mint>>,
-    pub token_e_mint: Box<Account<'info, Mint>>,
+    // pub token_a_mint: Box<Account<'info, Mint>>,
+    // pub token_b_mint: Box<Account<'info, Mint>>,
+    // pub token_c_mint: Box<Account<'info, Mint>>,
+    // pub token_d_mint: Box<Account<'info, Mint>>,
+    // pub token_e_mint: Box<Account<'info, Mint>>,
 
     pub rent: Sysvar<'info, Rent>,
     pub system_program: Program<'info, System>,
