@@ -70,7 +70,7 @@ pub mod multiple_tokens {
         token::transfer(ctx.accounts.into_transfer_to_vault_d_context(), amount_d)?;
         token::transfer(ctx.accounts.into_transfer_to_vault_e_context(), amount_e)?;
         
-
+        //msg!("up to here");
         let lp_amount = match calculate_lp_amount(amount_a, amount_b, amount_c, amount_d, amount_e) {
             Ok(sum) => {
                 println!("The sum is: {}", sum);
@@ -83,10 +83,22 @@ pub mod multiple_tokens {
         };
 
         assert!(lp_amount!=0, "Value should not be zero");
-    
+        //msg!("here now");
         // Mint LP tokens to user
-        token::mint_to(ctx.accounts.into_mint_to_context(), lp_amount)?;
-        
+        //token::mint_to(ctx.accounts.into_mint_to_context(), lp_amount)?;
+        token::mint_to(
+            CpiContext::new_with_signer(
+            ctx.accounts.token_program.to_account_info(),
+            MintTo {
+                authority: ctx.accounts.lp_mint.to_account_info(),
+                to: ctx.accounts.user_lp_account.to_account_info(),
+                mint: ctx.accounts.lp_mint.to_account_info()
+            },
+            &[&[
+                "lp_mint".as_bytes(),
+                &[ctx.bumps.lp_mint]
+            ]]
+        ), lp_amount)?;
         let liquidity_pool = &mut *ctx.accounts.liquidity_pool;
 
         // Update liquidity pool state
@@ -235,7 +247,7 @@ pub struct AddLiquidity<'info> {
     pub token_d_vault: Box<Account<'info, TokenAccount>>,
     #[account(mut)]
     pub token_e_vault: Box<Account<'info, TokenAccount>>,
-    #[account(mut)]
+    #[account(mut,seeds = ["lp_mint".as_bytes()], bump)]
     pub lp_mint: Box<Account<'info, Mint>>,
     #[account(init_if_needed, payer = user, associated_token::mint = lp_mint, associated_token::authority = user)]
     pub user_lp_account: Box<Account<'info, TokenAccount>>,
@@ -305,13 +317,19 @@ impl<'info> AddLiquidity<'info> {
 
 
     fn into_mint_to_context(&self) -> CpiContext<'_, '_, '_, 'info, MintTo<'info>> {
-        CpiContext::new(
+        let seeds: &[&[u8]] = &[
+        b"lp_mint",
+        ];
+        CpiContext::new_with_signer(
             self.token_program.to_account_info(),
             MintTo {
                 mint: self.lp_mint.to_account_info(),
                 to: self.user_lp_account.to_account_info(),
-                authority: self.liquidity_pool.to_account_info(),
+                authority: self.lp_mint.to_account_info(),
             },
+            &[&[
+                b"lp_mint",
+                ]]
         )
     }
 }
