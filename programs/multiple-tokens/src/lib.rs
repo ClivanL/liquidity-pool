@@ -1,7 +1,6 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Transfer, MintTo, TokenAccount, Mint, Token};
 use anchor_spl::associated_token::AssociatedToken;
-//use std::result::Result;
 mod constants;
 use constants::*;
 
@@ -14,12 +13,7 @@ pub mod multiple_tokens {
     pub fn create_liquidity_pool(ctx: Context<CreateLiquidityPool>) -> Result<()> {
         let liquidity_pool = &mut *ctx.accounts.liquidity_pool;
     
-        // Store the vault public keys in the LiquidityPool struct
-        // liquidity_pool.token_a_vault = (*ctx.accounts.token_a_vault).key();
-        // liquidity_pool.token_b_vault = (*ctx.accounts.token_b_vault).key();
-        // liquidity_pool.token_c_vault = (*ctx.accounts.token_c_vault).key();
-        // liquidity_pool.token_d_vault = (*ctx.accounts.token_d_vault).key();
-        // liquidity_pool.token_e_vault = (*ctx.accounts.token_e_vault).key();
+        // Initialize token vaults pubkey in liquidity pool
         liquidity_pool.token_a_vault = Pubkey::default();
         liquidity_pool.token_b_vault = Pubkey::default();
         liquidity_pool.token_c_vault = Pubkey::default();
@@ -83,9 +77,6 @@ pub mod multiple_tokens {
         };
 
         assert!(lp_amount!=0, "Value should not be zero");
-        //msg!("here now");
-        // Mint LP tokens to user
-        //token::mint_to(ctx.accounts.into_mint_to_context(), lp_amount)?;
         token::mint_to(
             CpiContext::new_with_signer(
             ctx.accounts.token_program.to_account_info(),
@@ -113,27 +104,10 @@ pub mod multiple_tokens {
 pub struct CreateLiquidityPool<'info> {
     #[account(init, payer = initializer,seeds = ["liquidity_pool".as_bytes()], bump, space = 8 + LiquidityPool::INIT_SPACE)]
     pub liquidity_pool: Box<Account<'info, LiquidityPool>>,
-    // #[account(init_if_needed, payer = initializer, associated_token::mint = token_a_mint, associated_token::authority = liquidity_pool)]
-    // pub token_a_vault: Box<Account<'info, TokenAccount>>,
-    // #[account(init_if_needed, payer = initializer, associated_token::mint = token_b_mint, associated_token::authority = liquidity_pool)]
-    // pub token_b_vault: Box<Account<'info, TokenAccount>>,
-    // #[account(init_if_needed, payer = initializer, associated_token::mint = token_c_mint, associated_token::authority = liquidity_pool)]
-    // pub token_c_vault: Box<Account<'info, TokenAccount>>,
-    // #[account(init_if_needed, payer = initializer, associated_token::mint = token_d_mint, associated_token::authority = liquidity_pool)]
-    // pub token_d_vault: Box<Account<'info, TokenAccount>>,
-    // #[account(init_if_needed, payer = initializer, associated_token::mint = token_e_mint, associated_token::authority = liquidity_pool)]
-    // pub token_e_vault: Box<Account<'info, TokenAccount>>,
     #[account(init, payer = initializer,seeds = ["lp_mint".as_bytes()], bump, mint::decimals = 9, mint::authority = lp_mint)]
     pub lp_mint: Box<Account<'info, Mint>>,
     #[account(mut)]
     pub initializer: Signer<'info>,
-    
-    // pub token_a_mint: Box<Account<'info, Mint>>,
-    // pub token_b_mint: Box<Account<'info, Mint>>,
-    // pub token_c_mint: Box<Account<'info, Mint>>,
-    // pub token_d_mint: Box<Account<'info, Mint>>,
-    // pub token_e_mint: Box<Account<'info, Mint>>,
-
     pub rent: Sysvar<'info, Rent>,
     pub system_program: Program<'info, System>,
     pub token_program: Program<'info, Token>,
@@ -150,19 +124,11 @@ pub struct CreateTokenVaultABC<'info> {
     pub token_b_vault: Box<Account<'info, TokenAccount>>,
     #[account(init_if_needed, payer = initializer, associated_token::mint = token_c_mint, associated_token::authority = liquidity_pool)]
     pub token_c_vault: Box<Account<'info, TokenAccount>>,
-    // #[account(init_if_needed, payer = initializer, associated_token::mint = token_d_mint, associated_token::authority = liquidity_pool, has_one = liquidity_pool)]
-    // pub token_d_vault: Box<Account<'info, TokenAccount>>,
-    // #[account(init_if_needed, payer = initializer, associated_token::mint = token_e_mint, associated_token::authority = liquidity_pool, has_one = liquidity_pool)]
-    // pub token_e_vault: Box<Account<'info, TokenAccount>>,
     #[account(mut)]
     pub initializer: Signer<'info>,
-    
     pub token_a_mint: Box<Account<'info, Mint>>,
     pub token_b_mint: Box<Account<'info, Mint>>,
     pub token_c_mint: Box<Account<'info, Mint>>,
-    // pub token_d_mint: Box<Account<'info, Mint>>,
-    // pub token_e_mint: Box<Account<'info, Mint>>,
-
     pub rent: Sysvar<'info, Rent>,
     pub system_program: Program<'info, System>,
     pub token_program: Program<'info, Token>,
@@ -173,25 +139,14 @@ pub struct CreateTokenVaultABC<'info> {
 pub struct CreateTokenVaultDE<'info> {
     #[account(mut)]
     pub liquidity_pool: Box<Account<'info, LiquidityPool>>,
-    // #[account(init_if_needed, payer = initializer, associated_token::mint = token_a_mint, associated_token::authority = liquidity_pool, has_one = liquidity_pool)]
-    // pub token_a_vault: Box<Account<'info, TokenAccount>>,
-    // #[account(init_if_needed, payer = initializer, associated_token::mint = token_b_mint, associated_token::authority = liquidity_pool, has_one = liquidity_pool)]
-    // pub token_b_vault: Box<Account<'info, TokenAccount>>,
-    // #[account(init_if_needed, payer = initializer, associated_token::mint = token_c_mint, associated_token::authority = liquidity_pool, has_one = liquidity_pool)]
-    // pub token_c_vault: Box<Account<'info, TokenAccount>>,
     #[account(init_if_needed, payer = initializer, associated_token::mint = token_d_mint, associated_token::authority = liquidity_pool)]
     pub token_d_vault: Box<Account<'info, TokenAccount>>,
     #[account(init_if_needed, payer = initializer, associated_token::mint = token_e_mint, associated_token::authority = liquidity_pool)]
     pub token_e_vault: Box<Account<'info, TokenAccount>>,
     #[account(mut)]
     pub initializer: Signer<'info>,
-    
-    // pub token_a_mint: Box<Account<'info, Mint>>,
-    // pub token_b_mint: Box<Account<'info, Mint>>,
-    // pub token_c_mint: Box<Account<'info, Mint>>,
     pub token_d_mint: Box<Account<'info, Mint>>,
     pub token_e_mint: Box<Account<'info, Mint>>,
-
     pub rent: Sysvar<'info, Rent>,
     pub system_program: Program<'info, System>,
     pub token_program: Program<'info, Token>,
@@ -236,7 +191,6 @@ pub struct AddLiquidity<'info> {
     pub user_token_d: Box<Account<'info, TokenAccount>>,
     #[account(mut)]
     pub user_token_e: Box<Account<'info, TokenAccount>>,
-
     #[account(mut)]
     pub token_a_vault: Box<Account<'info, TokenAccount>>,
     #[account(mut)]
@@ -315,23 +269,22 @@ impl<'info> AddLiquidity<'info> {
         )
     }
 
-
-    fn into_mint_to_context(&self) -> CpiContext<'_, '_, '_, 'info, MintTo<'info>> {
-        let seeds: &[&[u8]] = &[
-        b"lp_mint",
-        ];
-        CpiContext::new_with_signer(
-            self.token_program.to_account_info(),
-            MintTo {
-                mint: self.lp_mint.to_account_info(),
-                to: self.user_lp_account.to_account_info(),
-                authority: self.lp_mint.to_account_info(),
-            },
-            &[&[
-                b"lp_mint",
-                ]]
-        )
-    }
+    // fn into_mint_to_context(&self) -> CpiContext<'_, '_, '_, 'info, MintTo<'info>> {
+    //     let seeds: &[&[u8]] = &[
+    //     b"lp_mint",
+    //     ];
+    //     CpiContext::new_with_signer(
+    //         self.token_program.to_account_info(),
+    //         MintTo {
+    //             mint: self.lp_mint.to_account_info(),
+    //             to: self.user_lp_account.to_account_info(),
+    //             authority: self.lp_mint.to_account_info(),
+    //         },
+    //         &[&[
+    //             b"lp_mint",
+    //             ]]
+    //     )
+    // }
 }
 
 fn calculate_lp_amount(amount_a: u64, amount_b: u64, amount_c: u64, amount_d: u64, amount_e: u64) -> std::result::Result<u64,String> {

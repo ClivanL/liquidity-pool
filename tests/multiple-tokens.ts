@@ -1,15 +1,18 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import { MultipleTokens } from "../target/types/multiple_tokens";
-import { Connection, LAMPORTS_PER_SOL, PublicKey, Keypair } from "@solana/web3.js";
+import { PublicKey, Keypair } from "@solana/web3.js";
 import { BN } from "bn.js";
 import { getAssociatedTokenAddress } from "@solana/spl-token";
 import { ProgramError } from '@project-serum/anchor';
+import { getKeypairFromEnvironment } from "@solana-developers/helpers";
+import dotenv from "dotenv"
 
 describe("multiple-tokens", () => {
   // Configure the client to use the local cluster.
   const provider = anchor.AnchorProvider.env()
   anchor.setProvider(provider);
+  dotenv.config(); 
 
   const program = anchor.workspace.MultipleTokens as Program<MultipleTokens>;
 
@@ -26,12 +29,7 @@ describe("multiple-tokens", () => {
   const tokenAccountE = new PublicKey("3qCXtfBbYJADfM91eZyHx5SRyEPb9b98w6PcDQTkCehP");
   const [liquidityPoolPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("liquidity_pool")],program.programId) 
   const [lpMintPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("lp_mint")],program.programId)
-  const secretKeyUint8Array: Uint8Array = new Uint8Array([
-    // 32 bytes of your secret key
-    112,191,163,148,172,52,241,177,108,92,63,145,24,59,229,241,148,80,195,132,237,80,51,252,157,118,126,240,127,233,244,23,12,254,187,114,212,86,81,191,250,203,190,174,196,194,209,99,120,7,112,150,230,174,117,49,170,209,237,244,222,16,20,116
-  ]);
-  const user = Keypair.fromSecretKey(secretKeyUint8Array);
-
+  const user = getKeypairFromEnvironment("SECRET_KEY");
   it("Liquidity pool initialized!", async () => {
     // Add your test here.
     const tx = await program.methods.createLiquidityPool().rpc();
@@ -89,6 +87,8 @@ describe("multiple-tokens", () => {
           lpMint:lpMintPda
         }
       ).signers([user]).rpc();
+
+      console.log("Your transaction signature", tx);
     }
     catch (err){
       if (err instanceof ProgramError) {
@@ -97,7 +97,5 @@ describe("multiple-tokens", () => {
         console.error("Unexpected error:", err);
       }
     }
-
-    ///console.log("Your transaction signature", tx);
   });
 });
