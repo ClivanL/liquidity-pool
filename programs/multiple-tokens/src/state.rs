@@ -24,3 +24,14 @@ impl LiquidityPool {
         }
     }
 }
+
+#[account]
+pub struct UserAccount {
+    pub user_token_vault: Pubkey,
+    pub user: Pubkey,
+    pub balance: u64
+}
+
+impl UserAccount {
+    pub const INIT_SPACE:usize = PUBKEY_SIZE+PUBKEY_SIZE+U64_SIZE;
+}

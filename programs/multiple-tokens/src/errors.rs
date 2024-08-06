@@ -10,4 +10,6 @@ pub enum ProgramError {
 pub enum CustomError {
     #[msg("The liquidity pool is not initialized.")]
     LiquidityPoolNotInitialized,
+    #[msg("The token name does not exist.")]
+    InvalidTokenName,
 }

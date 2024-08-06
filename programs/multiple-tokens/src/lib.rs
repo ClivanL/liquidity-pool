@@ -31,6 +31,10 @@ pub mod multiple_tokens {
     pub fn add_liquidity(ctx: Context<AddLiquidity>, amount_a: u64, amount_b: u64, amount_c: u64, amount_d: u64, amount_e: u64) -> Result<()> {
         add_liquidity::handler(ctx, amount_a, amount_b, amount_c, amount_d, amount_e)
     }
+
+    pub fn create_account(ctx: Context<CreateAccount>, token_name:String) -> Result<()>{
+        create_account::handler(ctx,token_name)
+    }
 }
 
 

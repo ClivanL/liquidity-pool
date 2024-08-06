@@ -6,7 +6,8 @@ import { BN } from "bn.js";
 import { getAssociatedTokenAddress } from "@solana/spl-token";
 import { ProgramError } from '@project-serum/anchor';
 import { getKeypairFromEnvironment } from "@solana-developers/helpers";
-import dotenv from "dotenv"
+import dotenv from "dotenv";
+import { expect } from "chai";
 
 describe("multiple-tokens", () => {
   // Configure the client to use the local cluster.
@@ -56,6 +57,43 @@ describe("multiple-tokens", () => {
       }
     ).rpc();
     console.log("Your transaction signature", tx);
+  });
+
+  it("Create account for user for token A!", async () => {
+    // Add your test here.
+    const tx = await program.methods.createAccount("token_a").accounts(
+      {userTokenVault:tokenAccountA,
+        user:user.publicKey
+    }).signers([user]).rpc();
+    console.log("Your transaction signature", tx);
+    const [userTokenAccountPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("token_a"),user.publicKey.toBuffer()],program.programId);
+    const userTokenAccount = await program.account.userAccount.fetch(userTokenAccountPda);
+    console.log(userTokenAccount.user);
+    let expectedBalance = 0;
+    let receivedBalance = userTokenAccount.balance.toNumber();
+    expect(receivedBalance).to.equal(expectedBalance);
+  });
+
+  it("Create account for user for invalid token name!", async () => {
+    // Add your test here.
+    try{
+      const tx = await program.methods.createAccount("token_invalid").accounts(
+        {userTokenVault:tokenAccountA,
+          user:user.publicKey
+      }).signers([user]).rpc();
+      console.log("Your transaction signature", tx);
+      const [userTokenAccountPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("token_a"),user.publicKey.toBuffer()],program.programId);
+      const userTokenAccount = await program.account.userAccount.fetch(userTokenAccountPda);
+      console.log(userTokenAccount.user);
+      let expectedBalance = 0;
+      let receivedBalance = userTokenAccount.balance.toNumber();
+      expect(receivedBalance).to.equal(expectedBalance);
+      throw new Error ("Account created using invalid token name");
+    }
+    catch (err){
+      expect(err.message).to.include("The token name does not exist.");
+    }
+
   });
 
   it("Add liquidity to pool A, C, E!", async () => {

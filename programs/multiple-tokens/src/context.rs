@@ -57,6 +57,18 @@ pub struct CreateTokenVaultDE<'info> {
 }
 
 #[derive(Accounts)]
+#[instruction(token_name: String)]
+pub struct CreateAccount<'info> {
+    #[account(mut)]
+    pub user_token_vault: Account<'info, TokenAccount>,
+    #[account(init_if_needed, payer = user, seeds = [&token_name.as_bytes(), user.key().as_ref()], bump, space = 8+UserAccount::INIT_SPACE)]
+    pub user_token_account: Account<'info, UserAccount>,
+    #[account(mut)]
+    pub user: Signer<'info>,
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
 pub struct AddLiquidity<'info> {
     #[account(mut)]
     pub liquidity_pool: Box<Account<'info, LiquidityPool>>,
