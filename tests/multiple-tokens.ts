@@ -59,18 +59,19 @@ describe("multiple-tokens", () => {
     console.log("Your transaction signature", tx);
   });
 
-  it("Create account for user for token A!", async () => {
+  it("Create account for user for token C!", async () => {
     // Add your test here.
-    const tx = await program.methods.createAccount("token_a").accounts(
-      {userTokenVault:tokenAccountA,
+    const tx = await program.methods.createAccount("token_c").accounts(
+      {userTokenVault:tokenAccountC,
         user:user.publicKey
     }).signers([user]).rpc();
     console.log("Your transaction signature", tx);
-    const [userTokenAccountPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("token_a"),user.publicKey.toBuffer()],program.programId);
+    const [userTokenAccountPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("token_c"),user.publicKey.toBuffer()],program.programId);
     const userTokenAccount = await program.account.userAccount.fetch(userTokenAccountPda);
     console.log(userTokenAccount.user);
     let expectedBalance = 0;
     let receivedBalance = userTokenAccount.balance.toNumber();
+    console.log(userTokenAccount.tokenName.toString());
     expect(receivedBalance).to.equal(expectedBalance);
   });
 

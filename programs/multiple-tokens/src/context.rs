@@ -205,3 +205,33 @@ impl<'info> AddLiquidityV2<'info> {
         )
     }
 }
+
+
+//WIP
+// #[derive(Accounts)]
+// pub struct StakeTokens<'info> {
+//     #[account(mut)]
+//     pub liquidity_pool: Account<'info, LiquidityPool>,
+//     #[account(mut)]
+//     pub user_token_account: Account<'info, UserAccount>,
+//     #[account(mut)]
+//     pub token_a_vault: Box<Account<'info, TokenAccount>>,
+//     #[account(mut)]
+//     pub token_b_vault: Box<Account<'info, TokenAccount>>,
+//     #[account(mut)]
+//     pub token_c_vault: Box<Account<'info, TokenAccount>>,
+//     #[account(mut)]
+//     pub token_d_vault: Box<Account<'info, TokenAccount>>,
+//     #[account(mut)]
+//     pub token_e_vault: Box<Account<'info, TokenAccount>>,
+//     #[account(mut,seeds = ["lp_mint".as_bytes()], bump)]
+//     pub lp_mint: Box<Account<'info, Mint>>,
+//     #[account(init_if_needed, payer = user, associated_token::mint = lp_mint, associated_token::authority = user)]
+//     pub user_lp_account: Box<Account<'info, TokenAccount>>,
+//     #[account(mut)]
+//     pub user: Signer<'info>,
+//     pub token_program: Program<'info, Token>,
+//     pub rent: Sysvar<'info, Rent>,
+//     pub system_program: Program<'info, System>,
+//     pub associated_token_program: Program<'info, AssociatedToken>,
+// }

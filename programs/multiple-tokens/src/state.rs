@@ -29,9 +29,10 @@ impl LiquidityPool {
 pub struct UserAccount {
     pub user_token_vault: Pubkey,
     pub user: Pubkey,
-    pub balance: u64
+    pub balance: u64,
+    pub token_name: Vec<u8>,
 }
 
 impl UserAccount {
-    pub const INIT_SPACE:usize = PUBKEY_SIZE+PUBKEY_SIZE+U64_SIZE;
+    pub const INIT_SPACE:usize = PUBKEY_SIZE+PUBKEY_SIZE+U64_SIZE+TOKEN_NAME_SIZE;
 }
