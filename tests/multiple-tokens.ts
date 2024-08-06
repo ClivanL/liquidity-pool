@@ -136,4 +136,51 @@ describe("multiple-tokens", () => {
       }
     }
   });
+
+  it("Create account for user for token B!", async () => {
+    // Add your test here.
+    const tx = await program.methods.createAccount("token_b").accounts(
+      {userTokenVault:tokenAccountA,
+        user:user.publicKey
+    }).signers([user]).rpc();
+    console.log("Your transaction signature", tx);
+    const [userTokenAccountPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("token_b"),user.publicKey.toBuffer()],program.programId);
+    const userTokenAccount = await program.account.userAccount.fetch(userTokenAccountPda);
+    console.log(userTokenAccount.user);
+    let expectedBalance = 0;
+    let receivedBalance = userTokenAccount.balance.toNumber();
+    expect(receivedBalance).to.equal(expectedBalance);
+  });
+
+  it("Add liquidity to pool B, add_liquidity_v2!", async () => {
+    const tokenBVaultAddress = await getAssociatedTokenAddress(mintB, liquidityPoolPda,true);
+
+    const add = new BN(5);
+    const [userTokenAccountPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("token_b"),user.publicKey.toBuffer()],program.programId);
+    try{
+      const userTokenAccount = await program.account.userAccount.fetch(userTokenAccountPda);
+      let existingBalance = userTokenAccount.balance.toNumber();
+      const tx = await program.methods.addLiquidityV2(add).accounts(
+        {
+          userTokenAccount:userTokenAccountPda,
+          userToken:tokenAccountB,
+          tokenVault:tokenBVaultAddress,
+          user:user.publicKey,
+        }
+      ).signers([user]).rpc();
+
+      console.log("Your transaction signature", tx);
+      const updatedUserTokenAccount = await program.account.userAccount.fetch(userTokenAccountPda);
+      let newBalance = updatedUserTokenAccount.balance.toNumber();
+      expect(newBalance).to.equal(existingBalance+add.toNumber());
+    }
+    catch (err){
+      if (err instanceof ProgramError) {
+        console.error("Program error logs:", err.logs);
+      } else {
+        console.error("Unexpected error:", err);
+      }
+    }
+  });
+
 });

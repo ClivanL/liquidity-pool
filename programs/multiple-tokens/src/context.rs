@@ -68,6 +68,7 @@ pub struct CreateAccount<'info> {
     pub system_program: Program<'info, System>,
 }
 
+//method requires user to have all 5 token accounts transfer all 5 tokens at once
 #[derive(Accounts)]
 pub struct AddLiquidity<'info> {
     #[account(mut)]
@@ -176,4 +177,31 @@ impl<'info> AddLiquidity<'info> {
     //             ]]
     //     )
     // }
+}
+
+#[derive(Accounts)]
+pub struct AddLiquidityV2<'info> {
+    #[account(mut)]
+    pub user_token_account: Account<'info, UserAccount>,
+    #[account(mut)]
+    pub user_token: Account<'info, TokenAccount>,
+    #[account(mut)]
+    pub token_vault: Account<'info, TokenAccount>,
+    #[account(mut)]
+    pub user: Signer<'info>,
+    pub system_program: Program<'info, System>,
+    pub token_program: Program<'info, Token>,
+}
+
+impl<'info> AddLiquidityV2<'info> {
+    pub fn into_transfer_to_vault_context(&self) -> CpiContext<'_, '_, '_, 'info, Transfer<'info>> {
+        CpiContext::new(
+            self.token_program.to_account_info(),
+            Transfer {
+                from: self.user_token.to_account_info(),
+                to: self.token_vault.to_account_info(),
+                authority: self.user.to_account_info(),
+            },
+        )
+    }
 }
