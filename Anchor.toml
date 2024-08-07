@@ -5,10 +5,10 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-multiple_tokens = "EDBwJ2TUonePxXiA7C46VEucdw7LQE6GfDnytkauBJ6f"
+multiple_tokens = "HpcdH7e76Dep273mkjbyJqGB5QE3cPAXCB8LmDnwj3Hd"
 
 [programs.devnet]
-multiple_tokens = "EDBwJ2TUonePxXiA7C46VEucdw7LQE6GfDnytkauBJ6f"
+multiple_tokens = "HpcdH7e76Dep273mkjbyJqGB5QE3cPAXCB8LmDnwj3Hd"
 
 [registry]
 url = "https://api.apr.dev"

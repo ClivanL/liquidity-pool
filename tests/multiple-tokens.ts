@@ -184,4 +184,12 @@ describe("multiple-tokens", () => {
     }
   });
 
+  it("Init stake records", async()=>{
+    const tx = await program.methods.initStakeRecords().rpc();
+    console.log(tx);
+    const [stakeRecordsPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("stake_records")],program.programId);
+    const stakeRecords = await program.account.stakeRecords.fetch(stakeRecordsPda);
+    expect(stakeRecords.tokenAStake.toNumber()).to.equal(0);
+  })
+
 });

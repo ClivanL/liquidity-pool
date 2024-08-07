@@ -10,7 +10,7 @@ use anchor_lang::prelude::*;
 use instructions::*;
 use context::*;
 
-declare_id!("EDBwJ2TUonePxXiA7C46VEucdw7LQE6GfDnytkauBJ6f");
+declare_id!("HpcdH7e76Dep273mkjbyJqGB5QE3cPAXCB8LmDnwj3Hd");
 
 #[program]
 pub mod multiple_tokens {
@@ -37,6 +37,10 @@ pub mod multiple_tokens {
 
     pub fn create_account(ctx: Context<CreateAccount>, token_name:String) -> Result<()>{
         create_account::handler(ctx,token_name)
+    }
+
+    pub fn init_stake_records(ctx: Context<InitStakeRecords>) -> Result<()>{
+        init_stake_records::handler(ctx)
     }
 }
 

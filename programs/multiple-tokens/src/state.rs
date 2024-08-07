@@ -36,3 +36,16 @@ pub struct UserAccount {
 impl UserAccount {
     pub const INIT_SPACE:usize = PUBKEY_SIZE+PUBKEY_SIZE+U64_SIZE+TOKEN_NAME_SIZE;
 }
+
+#[account]
+pub struct StakeRecords{
+    pub token_a_stake: u64,
+    pub token_b_stake: u64,
+    pub token_c_stake: u64,
+    pub token_d_stake: u64,
+    pub token_e_stake: u64,
+}
+
+impl StakeRecords{
+    pub const INIT_SPACE:usize = U64_SIZE+U64_SIZE+U64_SIZE+U64_SIZE+U64_SIZE;
+}
