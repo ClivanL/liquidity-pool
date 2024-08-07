@@ -57,6 +57,21 @@ pub struct CreateTokenVaultDE<'info> {
 }
 
 #[derive(Accounts)]
+pub struct CreateLpTokenVault<'info> {
+    #[account(mut)]
+    pub liquidity_pool: Account<'info, LiquidityPool>,
+    #[account(init_if_needed, payer = initializer, associated_token::mint = lp_mint, associated_token::authority = liquidity_pool)]
+    pub token_lp_vault: Account<'info, TokenAccount>,
+    #[account(mut)]
+    pub lp_mint: Account<'info, Mint>,
+    #[account(mut)]
+    pub initializer: Signer<'info>,
+    pub system_program: Program<'info, System>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
+    pub token_program: Program<'info, Token>,
+}
+
+#[derive(Accounts)]
 #[instruction(token_name: String)]
 pub struct CreateAccount<'info> {
     #[account(mut)]
@@ -216,22 +231,22 @@ pub struct InitStakeRecords<'info> {
 }
 
 
-// #[derive(Accounts)]
-// #[instructions(token_name:String)]
-// pub struct StakeTokens<'info> {
-//     #[account(mut)]
-//     pub liquidity_pool: Account<'info, LiquidityPool>,
-//     #[account(mut)]
-//     pub user_token_account: Account<'info, UserAccount>,
-//     #[account(mut)]
-//     pub stake_records: Account<'info, StakeRecords>,
-//     #[account(mut,seeds = ["lp_mint".as_bytes()], bump)]
-//     pub lp_mint: Account<'info, Mint>,
-//     #[account(init_if_needed, payer = user, seeds=[&token_name.as_bytes(),user.key().as_ref()],bump, space = 8+UserAccount::INIT_SPACE)]
-//     pub user_lp_token_account: Account<'info, UserAccount>,
-//     #[account(mut)]
-//     pub user: Signer<'info>,
-//     pub token_program: Program<'info, Token>,
-//     pub rent: Sysvar<'info, Rent>,
-//     pub system_program: Program<'info, System>,
-// }
+#[derive(Accounts)]
+pub struct StakeTokens<'info> {
+    #[account(mut)]
+    pub liquidity_pool: Account<'info, LiquidityPool>,
+    #[account(mut)]
+    pub user_token_account: Account<'info, UserAccount>,
+    #[account(mut)]
+    pub stake_records: Account<'info, StakeRecords>,
+    #[account(mut)]
+    pub token_lp_vault: Account<'info, TokenAccount>,
+    #[account(mut,seeds = ["lp_mint".as_bytes()], bump)]
+    pub lp_mint: Account<'info, Mint>,
+    #[account(init_if_needed, payer = user, seeds=["lp_token".as_bytes(),user.key().as_ref()],bump, space = 8+UserAccount::INIT_SPACE)]
+    pub user_lp_token_account: Account<'info, UserAccount>,
+    #[account(mut)]
+    pub user: Signer<'info>,
+    pub token_program: Program<'info, Token>,
+    pub system_program: Program<'info, System>,
+}

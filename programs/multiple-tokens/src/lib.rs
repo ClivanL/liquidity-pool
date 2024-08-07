@@ -42,6 +42,11 @@ pub mod multiple_tokens {
     pub fn init_stake_records(ctx: Context<InitStakeRecords>) -> Result<()>{
         init_stake_records::handler(ctx)
     }
+
+    pub fn stake_tokens(ctx: Context<StakeTokens>,stake_amount:u64) -> Result<()>{
+        stake_tokens::handler(ctx,stake_amount)
+    }
+
 }
 
 

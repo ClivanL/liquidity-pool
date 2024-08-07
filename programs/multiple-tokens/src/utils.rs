@@ -22,3 +22,15 @@ pub fn check_valid_token_name(token_name: &str) -> Result<(),CustomError> {
         _ => Err(CustomError::InvalidTokenName)
     }
 }
+
+
+pub fn check_exchange_rate(token_name:&str) ->  Result<u64,CustomError> {
+    match token_name{
+        "token_a" => Ok(1),
+        "token_b" => Ok(2),
+        "token_c" => Ok(3),
+        "token_d" => Ok(4),
+        "token_e" => Ok(5),
+        _ => Err(CustomError::InvalidTokenName)
+    }
+}

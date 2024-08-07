@@ -12,4 +12,12 @@ pub enum CustomError {
     LiquidityPoolNotInitialized,
     #[msg("The token name does not exist.")]
     InvalidTokenName,
+    #[msg("Insufficient Balance in account. Please top up.")]
+    InsufficientBalance,
+    #[msg("Overflow.")]
+    Overflow,
+    #[msg("Addition overflowed.")]
+    AdditionOverflow,
+    #[msg("Invalid UTF-8 sequence.")]
+    InvalidUtf8,
 }
