@@ -47,6 +47,10 @@ pub mod multiple_tokens {
         stake_tokens::handler(ctx,stake_amount)
     }
 
+    pub fn create_lp_token_vault(ctx: Context<CreateLpTokenVault>) -> Result<()>{
+        create_lp_token_vault::handler(ctx)
+    }
+
 }
 
 

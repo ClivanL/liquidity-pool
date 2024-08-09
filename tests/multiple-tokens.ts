@@ -192,4 +192,47 @@ describe("multiple-tokens", () => {
     expect(stakeRecords.tokenAStake.toNumber()).to.equal(0);
   })
 
+  it("Create token vault for lp token!", async () => {
+    const tx = await program.methods.createLpTokenVault().accounts(
+      {liquidityPool:liquidityPoolPda,
+        lpMint:lpMintPda
+      }
+    ).rpc();
+    console.log("Your transaction signature", tx);
+  });
+
+  it("Stake tokens from token B account to exchange for lp token, with sufficient balance", async()=>{
+    
+    const [userTokenAccountBPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("token_b"),user.publicKey.toBuffer()],program.programId);
+    const [stakeRecordsPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("stake_records")],program.programId);
+    const lpTokenVaultAddress = await getAssociatedTokenAddress(lpMintPda, liquidityPoolPda,true);
+
+    let initialStakeRecords = await program.account.stakeRecords.fetch(stakeRecordsPda);
+    let initialTokenBStakeBalance = initialStakeRecords.tokenBStake.toNumber();
+
+    let initialUserTokenBAccount = await program.account.userAccount.fetch(userTokenAccountBPda);
+    let initialTokenBAccountBalance = initialUserTokenBAccount.balance.toNumber();
+
+    let stakeAmountInt = 5;
+    let stakeAmount = new BN(stakeAmountInt);
+
+    const tx = await program.methods.stakeTokens(stakeAmount).accounts({
+      liquidityPool:liquidityPoolPda,
+      userTokenAccount:userTokenAccountBPda,
+      stakeRecords:stakeRecordsPda,
+      tokenLpVault:lpTokenVaultAddress,
+      user:user.publicKey
+    }).signers([user]).rpc();
+    console.log(tx);
+
+    const stakeRecords = await program.account.stakeRecords.fetch(stakeRecordsPda);
+    let newTokenBStakeBalance = stakeRecords.tokenBStake.toNumber();
+    expect(newTokenBStakeBalance).to.equal(initialTokenBStakeBalance+stakeAmountInt);
+
+    let newUserTokenBAccount = await program.account.userAccount.fetch(userTokenAccountBPda);
+    let newTokenBAccountBalance = newUserTokenBAccount.balance.toNumber();
+
+    expect(newTokenBAccountBalance).to.equal(initialTokenBAccountBalance-stakeAmountInt);
+  })
+
 });
