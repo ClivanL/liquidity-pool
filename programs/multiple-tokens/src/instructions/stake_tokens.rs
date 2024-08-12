@@ -4,6 +4,7 @@ use anchor_spl::token;
 use anchor_spl::token::{MintTo};
 use crate::errors::*;
 use crate::utils::*;
+use switchboard_solana::{AggregatorAccountData, SwitchboardDecimal, SWITCHBOARD_PROGRAM_ID, JobAccountData};
 
 pub fn handler(ctx: Context<StakeTokens>, stake_amount:u64) -> Result<()> {
     let user_token_account = &mut ctx.accounts.user_token_account;
@@ -18,7 +19,25 @@ pub fn handler(ctx: Context<StakeTokens>, stake_amount:u64) -> Result<()> {
 
     let token_name_str = String::from_utf8(user_token_account.token_name.clone()).map_err(|_| CustomError::InvalidUtf8)?;;
     let token_name:&str = &token_name_str;
-    let exchange_rate = check_exchange_rate(token_name)?;
+
+    // Iterate over job public keys and their corresponding accounts
+        // for (i, job_pubkey) in feed.job_pubkeys_data.iter().enumerate() {
+        //     if job_pubkey != &Pubkey::default() {
+    
+        //         // Load the job data
+        //         let job_data: JobAccountData = JobAccountData::try_from_slice(job_pubkey)?;
+    
+        //         // Extract the job result or other relevant information
+        //         msg!("Job {} result: {:?}", i + 1, job_data.data);
+        //     }
+        // }
+    
+    //let feed_account = ctx.accounts.feed.data.borrow();
+    //let feed = PullFeedAccountData::parse(feed_account).unwrap();
+
+    //msg!("price: {:?}", feed_data[0]);
+
+    let exchange_rate = check_exchange_rate(&ctx,token_name)?;
     let lp_token_to_receive = stake_amount.checked_mul(exchange_rate).ok_or(CustomError::Overflow)?;
     
     // mint to vault for lp_token

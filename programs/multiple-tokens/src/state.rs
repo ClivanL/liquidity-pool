@@ -49,3 +49,8 @@ pub struct StakeRecords{
 impl StakeRecords{
     pub const INIT_SPACE:usize = U64_SIZE+U64_SIZE+U64_SIZE+U64_SIZE+U64_SIZE;
 }
+
+// #[account(zero_copy)]
+// pub struct AggregatorAccountData {
+//     pub rates: [u64; 5],
+// }

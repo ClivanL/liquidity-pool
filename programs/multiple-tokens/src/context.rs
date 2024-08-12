@@ -2,6 +2,10 @@ use anchor_lang::prelude::*;
 use anchor_spl::token::{Transfer, TokenAccount, Mint, Token};
 use crate::state::*;
 use anchor_spl::associated_token::AssociatedToken;
+use crate::config::*;
+use switchboard_solana::{AggregatorAccountData, SwitchboardDecimal, SWITCHBOARD_PROGRAM_ID};
+use std::str::FromStr;
+
 
 #[derive(Accounts)]
 pub struct CreateLiquidityPool<'info> {
@@ -230,7 +234,6 @@ pub struct InitStakeRecords<'info> {
     pub system_program: Program<'info, System>,
 }
 
-
 #[derive(Accounts)]
 pub struct StakeTokens<'info> {
     #[account(mut)]
@@ -249,4 +252,27 @@ pub struct StakeTokens<'info> {
     pub user: Signer<'info>,
     pub token_program: Program<'info, Token>,
     pub system_program: Program<'info, System>,
+    /// CHECK: This field is safe because this takes in public key for switchboard pull_feed
+    // #[account(mut)]
+    // pub feed: AccountInfo<'info>,
+    #[account(
+        address = Pubkey::from_str(FEED_ADDRESS_XRPBEARUSDT).unwrap()
+    )]
+    pub feed_aggregator_a: AccountLoader<'info, AggregatorAccountData>,
+    #[account(
+        address = Pubkey::from_str(FEED_ADDRESS_BTCUSD).unwrap()
+    )]
+    pub feed_aggregator_b: AccountLoader<'info, AggregatorAccountData>,
+    #[account(
+        address = Pubkey::from_str(FEED_ADDRESS_ETHUSDT).unwrap()
+    )]
+    pub feed_aggregator_c: AccountLoader<'info, AggregatorAccountData>,
+    #[account(
+        address = Pubkey::from_str(FEED_ADDRESS_BULLBUSD).unwrap()
+    )]
+    pub feed_aggregator_d: AccountLoader<'info, AggregatorAccountData>,
+    #[account(
+        address = Pubkey::from_str(FEED_ADDRESS_EOSBEARBUSD).unwrap()
+    )]
+    pub feed_aggregator_e: AccountLoader<'info, AggregatorAccountData>,
 }

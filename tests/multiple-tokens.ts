@@ -8,6 +8,14 @@ import { ProgramError } from '@project-serum/anchor';
 import { getKeypairFromEnvironment } from "@solana-developers/helpers";
 import dotenv from "dotenv";
 import { expect } from "chai";
+import { loadDataFeed } from "./oracle";
+import {
+  AggregatorAccount,
+  SwitchboardProgram,
+} from "@switchboard-xyz/solana.js";
+//import { Big } from "big.js";
+
+
 
 describe("multiple-tokens", () => {
   // Configure the client to use the local cluster.
@@ -31,6 +39,9 @@ describe("multiple-tokens", () => {
   const [liquidityPoolPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("liquidity_pool")],program.programId) 
   const [lpMintPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("lp_mint")],program.programId)
   const user = getKeypairFromEnvironment("SECRET_KEY");
+
+  const ORACLE_FEED_ADDRESS = new PublicKey("q7AQr3jWfuKjeSy5anC4jz79gkgKrHnCNGd2xxTi9Mo");
+
   it("Liquidity pool initialized!", async () => {
     // Add your test here.
     const tx = await program.methods.createLiquidityPool().rpc();
@@ -206,6 +217,7 @@ describe("multiple-tokens", () => {
     const [userTokenAccountBPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("token_b"),user.publicKey.toBuffer()],program.programId);
     const [stakeRecordsPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("stake_records")],program.programId);
     const lpTokenVaultAddress = await getAssociatedTokenAddress(lpMintPda, liquidityPoolPda,true);
+    let [userLpTokenAccountPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("lp_token"),user.publicKey.toBuffer()],program.programId);
 
     let initialStakeRecords = await program.account.stakeRecords.fetch(stakeRecordsPda);
     let initialTokenBStakeBalance = initialStakeRecords.tokenBStake.toNumber();
@@ -216,12 +228,46 @@ describe("multiple-tokens", () => {
     let stakeAmountInt = 5;
     let stakeAmount = new BN(stakeAmountInt);
 
+    // const switchboardProgram = await SwitchboardProgram.load(
+    //   new anchor.web3.Connection("https://api.devnet.solana.com"),
+    //   user,
+    // );
+    // const aggregatorAccount = new AggregatorAccount(
+    //   switchboardProgram,
+    //   ORACLE_FEED_ADDRESS,
+    // );
+    // const aggregatorAccounts = await aggregatorAccount.fetchAccounts();
+    // //console.log(aggregatorAccounts)
+
+    // const prices:Big|null = await aggregatorAccount.fetchLatestValue();
+    // console.log(prices);
+    // const test = await aggregatorAccount.loadData();
+
+    // const jobPubkeys = test.jobPubkeysData;
+    // for (let i = 0; i < jobPubkeys.length; i++) {
+    //   const jobPubkey = jobPubkeys[i];
+    //   if (jobPubkey.toBase58() !== anchor.web3.PublicKey.default.toBase58()) {
+    //     const jobAccount = new JobAccount(switchboardProgram, jobPubkey);
+    //     //const jobData = await jobAccount.loadData();
+    //     let price:Big|null = await jobAccount.loadData();
+    //     console.log(`Job ${i + 1} result:`, price);
+    //   }
+    // }
+
+    // const results = await aggregatorAccount.getConfirmedRoundResults(test);
+    // console.log(results[1].value);
+    // console.log(results[0].value);
+    
+
     const tx = await program.methods.stakeTokens(stakeAmount).accounts({
       liquidityPool:liquidityPoolPda,
       userTokenAccount:userTokenAccountBPda,
       stakeRecords:stakeRecordsPda,
       tokenLpVault:lpTokenVaultAddress,
-      user:user.publicKey
+      user:user.publicKey,
+      //aggregatorAccount:aggregatorAccount,
+      lpMint:lpMintPda,
+      userLpTokenAccount:userLpTokenAccountPda
     }).signers([user]).rpc();
     console.log(tx);
 

@@ -20,4 +20,15 @@ pub enum CustomError {
     AdditionOverflow,
     #[msg("Invalid UTF-8 sequence.")]
     InvalidUtf8,
+    #[msg("Cannot retrieve value from feed.")]
+    FeedError,
+    #[msg("An error occurred with the Switchboard Oracle.")]
+    SwitchboardError,
+}
+
+
+impl From<switchboard_solana::Error> for CustomError {
+    fn from(error: switchboard_solana::Error) -> Self {
+        CustomError::SwitchboardError
+    }
 }
