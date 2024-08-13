@@ -24,11 +24,13 @@ pub enum CustomError {
     FeedError,
     #[msg("An error occurred with the Switchboard Oracle.")]
     SwitchboardError,
+    #[msg("Mathematical operation resulted in an invalid value")]
+    InvalidValue,
 }
 
 
 impl From<switchboard_solana::Error> for CustomError {
-    fn from(error: switchboard_solana::Error) -> Self {
+    fn from(_error: switchboard_solana::Error) -> Self {
         CustomError::SwitchboardError
     }
 }

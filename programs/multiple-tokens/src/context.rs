@@ -3,7 +3,7 @@ use anchor_spl::token::{Transfer, TokenAccount, Mint, Token};
 use crate::state::*;
 use anchor_spl::associated_token::AssociatedToken;
 use crate::config::*;
-use switchboard_solana::{AggregatorAccountData, SwitchboardDecimal, SWITCHBOARD_PROGRAM_ID};
+use switchboard_solana::{AggregatorAccountData};
 use std::str::FromStr;
 
 

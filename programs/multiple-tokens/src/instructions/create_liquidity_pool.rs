@@ -11,7 +11,7 @@ pub fn handler(ctx: Context<CreateLiquidityPool>) -> Result<()> {
     liquidity_pool.token_d_vault = Pubkey::default();
     liquidity_pool.token_e_vault = Pubkey::default();
     liquidity_pool.lp_mint = (*ctx.accounts.lp_mint).key();
-    liquidity_pool.total_lp_supply = 0; // Initialize the total supply
+    liquidity_pool.total_lp_supply = 0.0; // Initialize the total supply
 
     Ok(())
 }

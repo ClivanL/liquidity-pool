@@ -42,7 +42,7 @@ pub fn handler(ctx: Context<AddLiquidity>, amount_a: u64, amount_b: u64, amount_
     let liquidity_pool = &mut *ctx.accounts.liquidity_pool;
 
     // Update liquidity pool state
-    liquidity_pool.total_lp_supply += lp_amount;
+    liquidity_pool.total_lp_supply += lp_amount as f64;
 
     Ok(())
 }

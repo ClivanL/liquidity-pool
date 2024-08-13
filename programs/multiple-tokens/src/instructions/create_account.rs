@@ -9,7 +9,7 @@ pub fn handler(ctx: Context<CreateAccount>,token_name:String) -> Result<()> {
     user_token_account.user_token_vault = ctx.accounts.user_token_vault.key();
     user_token_account.user = ctx.accounts.user.key();
     user_token_account.token_name = token_name.into_bytes();
-    user_token_account.balance = 0;
+    user_token_account.balance = 0.0;
 
     Ok(())
 }

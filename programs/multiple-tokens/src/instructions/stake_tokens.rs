@@ -4,9 +4,15 @@ use anchor_spl::token;
 use anchor_spl::token::{MintTo};
 use crate::errors::*;
 use crate::utils::*;
-use switchboard_solana::{AggregatorAccountData, SwitchboardDecimal, SWITCHBOARD_PROGRAM_ID, JobAccountData};
 
-pub fn handler(ctx: Context<StakeTokens>, stake_amount:u64) -> Result<()> {
+pub fn handler(ctx: Context<StakeTokens>, stake_amount:f64) -> Result<()> {
+
+    //check exchange rate
+    let user_token_account_copy = ctx.accounts.user_token_account.clone();
+    let token_name_str = String::from_utf8(user_token_account_copy.token_name.clone()).map_err(|_| CustomError::InvalidUtf8)?;
+    let token_name:&str = &token_name_str;
+    let exchange_rate = check_exchange_rate(&ctx,token_name)?;
+
     let user_token_account = &mut ctx.accounts.user_token_account;
 
     // check if balance is sufficient for deduction of stated amount
@@ -17,28 +23,18 @@ pub fn handler(ctx: Context<StakeTokens>, stake_amount:u64) -> Result<()> {
     // deduct from token account
     user_token_account.balance-=stake_amount;
 
-    let token_name_str = String::from_utf8(user_token_account.token_name.clone()).map_err(|_| CustomError::InvalidUtf8)?;;
-    let token_name:&str = &token_name_str;
-
-    // Iterate over job public keys and their corresponding accounts
-        // for (i, job_pubkey) in feed.job_pubkeys_data.iter().enumerate() {
-        //     if job_pubkey != &Pubkey::default() {
+    let lp_token_to_receive = stake_amount*exchange_rate;
+    if lp_token_to_receive.is_nan() || lp_token_to_receive.is_infinite(){
+        return Err(CustomError::InvalidValue.into());
+    }
     
-        //         // Load the job data
-        //         let job_data: JobAccountData = JobAccountData::try_from_slice(job_pubkey)?;
-    
-        //         // Extract the job result or other relevant information
-        //         msg!("Job {} result: {:?}", i + 1, job_data.data);
-        //     }
-        // }
-    
-    //let feed_account = ctx.accounts.feed.data.borrow();
-    //let feed = PullFeedAccountData::parse(feed_account).unwrap();
+    //calculate the balance to return to token account due to inability to complete minting of whole coin
+    let lp_token_to_receive_rounded_down = lp_token_to_receive.floor();
+    let refund = (lp_token_to_receive-lp_token_to_receive_rounded_down)/exchange_rate;
+    user_token_account.balance+=refund;
 
-    //msg!("price: {:?}", feed_data[0]);
-
-    let exchange_rate = check_exchange_rate(&ctx,token_name)?;
-    let lp_token_to_receive = stake_amount.checked_mul(exchange_rate).ok_or(CustomError::Overflow)?;
+    //update resulting stake_balance
+    let stake_balance = stake_amount-refund;
     
     // mint to vault for lp_token
     token::mint_to(
@@ -53,29 +49,49 @@ pub fn handler(ctx: Context<StakeTokens>, stake_amount:u64) -> Result<()> {
             "lp_mint".as_bytes(),
             &[ctx.bumps.lp_mint]
         ]]
-    ), lp_token_to_receive)?; 
+    ), lp_token_to_receive_rounded_down as u64)?; 
 
     // update total minted lp token supply in liquidity pool
     let liquidity_pool = &mut ctx.accounts.liquidity_pool;
-    liquidity_pool.total_lp_supply+=lp_token_to_receive;
+    liquidity_pool.total_lp_supply+=lp_token_to_receive_rounded_down;
 
     // update staked records 
     let stake_records = &mut ctx.accounts.stake_records;
     match token_name {
         "token_a" => {
-            stake_records.token_a_stake = stake_records.token_a_stake.checked_add(stake_amount).ok_or(CustomError::AdditionOverflow)?;
+            let new_balance = stake_records.token_a_stake+stake_balance;
+            if new_balance.is_nan() || new_balance.is_infinite(){
+                return Err(CustomError::InvalidValue.into());
+            }
+            stake_records.token_a_stake = new_balance;
         },
         "token_b" => {
-            stake_records.token_b_stake = stake_records.token_b_stake.checked_add(stake_amount).ok_or(CustomError::AdditionOverflow)?;
+            let new_balance = stake_records.token_b_stake+stake_balance;
+            if new_balance.is_nan() || new_balance.is_infinite(){
+                return Err(CustomError::InvalidValue.into());
+            }
+            stake_records.token_b_stake = new_balance;
         },
         "token_c" => {
-            stake_records.token_c_stake = stake_records.token_c_stake.checked_add(stake_amount).ok_or(CustomError::AdditionOverflow)?;
+            let new_balance = stake_records.token_c_stake+stake_balance;
+            if new_balance.is_nan() || new_balance.is_infinite(){
+                return Err(CustomError::InvalidValue.into());
+            }
+            stake_records.token_c_stake = new_balance;
         },
         "token_d" => {
-            stake_records.token_d_stake = stake_records.token_d_stake.checked_add(stake_amount).ok_or(CustomError::AdditionOverflow)?;
+            let new_balance = stake_records.token_d_stake+stake_balance;
+            if new_balance.is_nan() || new_balance.is_infinite(){
+                return Err(CustomError::InvalidValue.into());
+            }
+            stake_records.token_d_stake = new_balance;
         },
         "token_e" => {
-            stake_records.token_e_stake = stake_records.token_e_stake.checked_add(stake_amount).ok_or(CustomError::AdditionOverflow)?;
+            let new_balance = stake_records.token_e_stake+stake_balance;
+            if new_balance.is_nan() || new_balance.is_infinite(){
+                return Err(CustomError::InvalidValue.into());
+            }
+            stake_records.token_e_stake = new_balance;
         },
         _=>{
             return Err(CustomError::InvalidTokenName.into());
@@ -84,7 +100,11 @@ pub fn handler(ctx: Context<StakeTokens>, stake_amount:u64) -> Result<()> {
 
     // update user_lp_token_account
     let user_lp_token_account = &mut ctx.accounts.user_lp_token_account;
-    user_lp_token_account.balance.checked_add(lp_token_to_receive).ok_or(CustomError::AdditionOverflow)?;
+    let new_balance = user_lp_token_account.balance+lp_token_to_receive_rounded_down;
+    if new_balance.is_nan() || new_balance.is_infinite(){
+        return Err(CustomError::InvalidValue.into());
+    }
+    user_lp_token_account.balance = new_balance;
 
     Ok(())
 }
