@@ -1,19 +1,18 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import { MultipleTokens } from "../target/types/multiple_tokens";
-import { PublicKey, Keypair } from "@solana/web3.js";
+import { PublicKey } from "@solana/web3.js";
 import { BN } from "bn.js";
 import { getAssociatedTokenAddress } from "@solana/spl-token";
 import { ProgramError } from '@project-serum/anchor';
 import { getKeypairFromEnvironment } from "@solana-developers/helpers";
 import dotenv from "dotenv";
 import { expect } from "chai";
-import { loadDataFeed } from "./oracle";
 import {
   AggregatorAccount,
   SwitchboardProgram,
 } from "@switchboard-xyz/solana.js";
-//import { Big } from "big.js";
+import { Big } from "big.js";
 
 
 
@@ -40,7 +39,11 @@ describe("multiple-tokens", () => {
   const [lpMintPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("lp_mint")],program.programId)
   const user = getKeypairFromEnvironment("SECRET_KEY");
 
-  const ORACLE_FEED_ADDRESS = new PublicKey("q7AQr3jWfuKjeSy5anC4jz79gkgKrHnCNGd2xxTi9Mo");
+  const ORACLE_FEED_ADDRESS_A = new PublicKey("q7AQr3jWfuKjeSy5anC4jz79gkgKrHnCNGd2xxTi9Mo");
+  const ORACLE_FEED_ADDRESS_B = new PublicKey("Gz6z31ahSdzwxWMgXWy7WFTpGkZr9bsjWZztVMC7m5KL");
+  const ORACLE_FEED_ADDRESS_C = new PublicKey("6TPpVqaHMnkQDi45TYaJb4rR3F8HoV7jBz3MJe1kSgqb");
+  const ORACLE_FEED_ADDRESS_D = new PublicKey("82Ns7bfKkHqFkLraBhTvVpKojFsRYWC9NJhjChh8vtCK");
+  const ORACLE_FEED_ADDRESS_E = new PublicKey("BXrJibE6Z3CbFZuxXbmhe9jJdkUhkbuxzDnTKYqs3dwt");
 
   it("Liquidity pool initialized!", async () => {
     // Add your test here.
@@ -81,7 +84,7 @@ describe("multiple-tokens", () => {
     const userTokenAccount = await program.account.userAccount.fetch(userTokenAccountPda);
     console.log(userTokenAccount.user);
     let expectedBalance = 0;
-    let receivedBalance = userTokenAccount.balance.toNumber();
+    let receivedBalance = userTokenAccount.balance as number;
     console.log(userTokenAccount.tokenName.toString());
     expect(receivedBalance).to.equal(expectedBalance);
   });
@@ -98,7 +101,7 @@ describe("multiple-tokens", () => {
       const userTokenAccount = await program.account.userAccount.fetch(userTokenAccountPda);
       console.log(userTokenAccount.user);
       let expectedBalance = 0;
-      let receivedBalance = userTokenAccount.balance.toNumber();
+      let receivedBalance = userTokenAccount.balance as number;
       expect(receivedBalance).to.equal(expectedBalance);
       throw new Error ("Account created using invalid token name");
     }
@@ -160,7 +163,7 @@ describe("multiple-tokens", () => {
     const userTokenAccount = await program.account.userAccount.fetch(userTokenAccountPda);
     console.log(userTokenAccount.user);
     let expectedBalance = 0;
-    let receivedBalance = userTokenAccount.balance.toNumber();
+    let receivedBalance = userTokenAccount.balance as number;
     expect(receivedBalance).to.equal(expectedBalance);
   });
 
@@ -171,7 +174,7 @@ describe("multiple-tokens", () => {
     const [userTokenAccountPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("token_b"),user.publicKey.toBuffer()],program.programId);
     try{
       const userTokenAccount = await program.account.userAccount.fetch(userTokenAccountPda);
-      let existingBalance = userTokenAccount.balance.toNumber();
+      let existingBalance = userTokenAccount.balance as number;
       const tx = await program.methods.addLiquidityV2(add).accounts(
         {
           userTokenAccount:userTokenAccountPda,
@@ -183,7 +186,7 @@ describe("multiple-tokens", () => {
 
       console.log("Your transaction signature", tx);
       const updatedUserTokenAccount = await program.account.userAccount.fetch(userTokenAccountPda);
-      let newBalance = updatedUserTokenAccount.balance.toNumber();
+      let newBalance = updatedUserTokenAccount.balance as number;
       expect(newBalance).to.equal(existingBalance+add.toNumber());
     }
     catch (err){
@@ -200,7 +203,7 @@ describe("multiple-tokens", () => {
     console.log(tx);
     const [stakeRecordsPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("stake_records")],program.programId);
     const stakeRecords = await program.account.stakeRecords.fetch(stakeRecordsPda);
-    expect(stakeRecords.tokenAStake.toNumber()).to.equal(0);
+    expect(stakeRecords.tokenAStake as number).to.equal(0);
   })
 
   it("Create token vault for lp token!", async () => {
@@ -220,43 +223,27 @@ describe("multiple-tokens", () => {
     let [userLpTokenAccountPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("lp_token"),user.publicKey.toBuffer()],program.programId);
 
     let initialStakeRecords = await program.account.stakeRecords.fetch(stakeRecordsPda);
-    let initialTokenBStakeBalance = initialStakeRecords.tokenBStake.toNumber();
+    let initialTokenBStakeBalance = initialStakeRecords.tokenBStake as number;
 
     let initialUserTokenBAccount = await program.account.userAccount.fetch(userTokenAccountBPda);
-    let initialTokenBAccountBalance = initialUserTokenBAccount.balance.toNumber();
+    let initialTokenBAccountBalance = initialUserTokenBAccount.balance as number;
 
-    let stakeAmountInt = 5;
-    let stakeAmount = new BN(stakeAmountInt);
+    let stakeAmount = 5.0
 
-    // const switchboardProgram = await SwitchboardProgram.load(
-    //   new anchor.web3.Connection("https://api.devnet.solana.com"),
-    //   user,
-    // );
-    // const aggregatorAccount = new AggregatorAccount(
-    //   switchboardProgram,
-    //   ORACLE_FEED_ADDRESS,
-    // );
-    // const aggregatorAccounts = await aggregatorAccount.fetchAccounts();
-    // //console.log(aggregatorAccounts)
+    const switchboardProgram = await SwitchboardProgram.load(
+      new anchor.web3.Connection("https://api.devnet.solana.com"),
+      user,
+    );
+    const aggregatorAccountB = new AggregatorAccount(
+      switchboardProgram,
+      ORACLE_FEED_ADDRESS_B,
+    );
 
-    // const prices:Big|null = await aggregatorAccount.fetchLatestValue();
-    // console.log(prices);
-    // const test = await aggregatorAccount.loadData();
-
-    // const jobPubkeys = test.jobPubkeysData;
-    // for (let i = 0; i < jobPubkeys.length; i++) {
-    //   const jobPubkey = jobPubkeys[i];
-    //   if (jobPubkey.toBase58() !== anchor.web3.PublicKey.default.toBase58()) {
-    //     const jobAccount = new JobAccount(switchboardProgram, jobPubkey);
-    //     //const jobData = await jobAccount.loadData();
-    //     let price:Big|null = await jobAccount.loadData();
-    //     console.log(`Job ${i + 1} result:`, price);
-    //   }
-    // }
-
-    // const results = await aggregatorAccount.getConfirmedRoundResults(test);
-    // console.log(results[1].value);
-    // console.log(results[0].value);
+    const prices:Big|null = await aggregatorAccountB.fetchLatestValue();
+    if (prices===null){
+      throw new Error("unable to read latest price from oracle");
+    }
+    let refundedValue = (stakeAmount*prices.toNumber() - Math.floor(stakeAmount*prices.toNumber()))/prices.toNumber();
     
 
     const tx = await program.methods.stakeTokens(stakeAmount).accounts({
@@ -265,20 +252,18 @@ describe("multiple-tokens", () => {
       stakeRecords:stakeRecordsPda,
       tokenLpVault:lpTokenVaultAddress,
       user:user.publicKey,
-      //aggregatorAccount:aggregatorAccount,
       lpMint:lpMintPda,
       userLpTokenAccount:userLpTokenAccountPda
     }).signers([user]).rpc();
     console.log(tx);
 
     const stakeRecords = await program.account.stakeRecords.fetch(stakeRecordsPda);
-    let newTokenBStakeBalance = stakeRecords.tokenBStake.toNumber();
-    expect(newTokenBStakeBalance).to.equal(initialTokenBStakeBalance+stakeAmountInt);
+    let newTokenBStakeBalance = stakeRecords.tokenBStake as number;
+    expect(newTokenBStakeBalance).to.equal(initialTokenBStakeBalance+stakeAmount-refundedValue); 
 
     let newUserTokenBAccount = await program.account.userAccount.fetch(userTokenAccountBPda);
-    let newTokenBAccountBalance = newUserTokenBAccount.balance.toNumber();
-
-    expect(newTokenBAccountBalance).to.equal(initialTokenBAccountBalance-stakeAmountInt);
+    let newTokenBAccountBalance = newUserTokenBAccount.balance as number;
+    expect(newTokenBAccountBalance).to.equal(initialTokenBAccountBalance-stakeAmount+refundedValue); 
   })
 
 });
