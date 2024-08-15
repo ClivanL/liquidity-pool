@@ -11,7 +11,7 @@ use anchor_lang::prelude::*;
 use instructions::*;
 use context::*;
 
-declare_id!("3aY184d1y7edHNXjT2pfZroinn38V8oapY6ykxDH6i7Q");
+declare_id!("7xFgubq7M6zSAbCdTc9oFVmfarAHvgPELE5bN34VswC7");
 
 #[program]
 pub mod multiple_tokens {

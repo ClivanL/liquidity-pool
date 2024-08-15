@@ -30,11 +30,13 @@ pub struct UserAccount {
     pub user_token_vault: Pubkey,
     pub user: Pubkey,
     pub balance: f64,
-    pub token_name: Vec<u8>,
+    pub pending_stake: f64,
+    pub token_name: Vec<u8>
+    
 }
 
 impl UserAccount {
-    pub const INIT_SPACE:usize = PUBKEY_SIZE+PUBKEY_SIZE+F64_SIZE+TOKEN_NAME_SIZE;
+    pub const INIT_SPACE:usize = PUBKEY_SIZE+PUBKEY_SIZE+F64_SIZE+F64_SIZE+TOKEN_NAME_SIZE;
 }
 
 #[account]
