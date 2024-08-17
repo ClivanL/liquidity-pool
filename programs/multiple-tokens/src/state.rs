@@ -56,3 +56,27 @@ impl StakeRecords{
 // pub struct AggregatorAccountData {
 //     pub rates: [u64; 5],
 // }
+
+#[account]
+pub struct PendingStakeSeedRecords{
+    pub last_index:u8,
+    pub sub_seeds:Vec<String>,
+    
+}
+
+impl PendingStakeSeedRecords{
+    pub const INIT_SPACE:usize = U8_SIZE+SUB_SEEDS_VECTOR_SIZE;
+}
+
+#[account]
+pub struct StakeTokenTransaction{
+    pub stake_amount:f64,
+    pub tokens_to_mint:u64,
+    pub exchange_rate:f64,
+    pub token_name: Vec<u8>,
+    pub user_pubkey:Pubkey
+}
+
+impl StakeTokenTransaction{
+    pub const INIT_SPACE:usize = F64_SIZE+U64_SIZE+F64_SIZE+TOKEN_NAME_SIZE+PUBKEY_SIZE;
+}

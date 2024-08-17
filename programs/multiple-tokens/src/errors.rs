@@ -26,6 +26,8 @@ pub enum CustomError {
     SwitchboardError,
     #[msg("Mathematical operation resulted in an invalid value")]
     InvalidValue,
+    #[msg("Transaction initiator is not the owner.")]
+    InvalidOwner
 }
 
 

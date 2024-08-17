@@ -276,3 +276,56 @@ pub struct StakeTokens<'info> {
     )]
     pub feed_aggregator_e: AccountLoader<'info, AggregatorAccountData>,
 }
+
+#[derive(Accounts)]
+pub struct InitPendingStakeSeedRecords<'info>{
+    #[account(init, payer=initializer, seeds=["master_seed".as_bytes()], bump, space=8+PendingStakeSeedRecords::INIT_SPACE)]
+    pub pending_stake_seed_records: Account<'info,PendingStakeSeedRecords>,
+    #[account(mut)]
+    pub initializer: Signer<'info>,
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+pub struct StakeTokensV2<'info> {
+    #[account(mut)]
+    pub liquidity_pool: Account<'info, LiquidityPool>,
+    #[account(mut)]
+    pub user_token_account: Account<'info, UserAccount>,
+    #[account(mut)]
+    pub stake_records: Account<'info, StakeRecords>,
+    #[account(mut)]
+    pub token_lp_vault: Account<'info, TokenAccount>,
+    #[account(mut,seeds = ["lp_mint".as_bytes()], bump)]
+    pub lp_mint: Account<'info, Mint>,
+    // #[account(init_if_needed, payer = user, seeds=["lp_token".as_bytes(),user.key().as_ref()],bump, space = 8+UserAccount::INIT_SPACE)]
+    // pub user_lp_token_account: Account<'info, UserAccount>,
+    #[account(mut)]
+    pub user: Signer<'info>,
+    pub token_program: Program<'info, Token>,
+    pub system_program: Program<'info, System>,
+    #[account(
+        address = Pubkey::from_str(FEED_ADDRESS_XRPBEARUSDT).unwrap()
+    )]
+    pub feed_aggregator_a: AccountLoader<'info, AggregatorAccountData>,
+    #[account(
+        address = Pubkey::from_str(FEED_ADDRESS_BTCUSD).unwrap()
+    )]
+    pub feed_aggregator_b: AccountLoader<'info, AggregatorAccountData>,
+    #[account(
+        address = Pubkey::from_str(FEED_ADDRESS_ETHUSDT).unwrap()
+    )]
+    pub feed_aggregator_c: AccountLoader<'info, AggregatorAccountData>,
+    #[account(
+        address = Pubkey::from_str(FEED_ADDRESS_BULLBUSD).unwrap()
+    )]
+    pub feed_aggregator_d: AccountLoader<'info, AggregatorAccountData>,
+    #[account(
+        address = Pubkey::from_str(FEED_ADDRESS_EOSBEARBUSD).unwrap()
+    )]
+    pub feed_aggregator_e: AccountLoader<'info, AggregatorAccountData>,
+    #[account(mut)]
+    pub pending_stake_seed_records: Account<'info,PendingStakeSeedRecords>,
+    #[account(init, payer=user, seeds=["pending_stake".as_bytes(), ("s".to_owned()+&pending_stake_seed_records.last_index.to_string()).as_bytes()],bump, space=8+StakeTokenTransaction::INIT_SPACE)]
+    pub stake_token_transaction: Account<'info,StakeTokenTransaction>
+}

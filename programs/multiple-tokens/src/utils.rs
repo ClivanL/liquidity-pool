@@ -64,3 +64,39 @@ pub fn check_exchange_rate(ctx: &Context<StakeTokens>, token_name:&str) ->  Resu
         _ => Err(CustomError::InvalidTokenName)
     }
 }
+
+pub fn check_exchange_rate_v2(ctx: &Context<StakeTokensV2>, token_name:&str) ->  Result<f64,CustomError> {
+    match token_name{
+        "token_a" => {
+            let feed_a = &mut ctx.accounts.feed_aggregator_a.load()?;
+            let feed_a_data:f64 =  feed_a.get_result()?.try_into()?;
+            msg!("price token a: {:?}", feed_a_data);
+            Ok(feed_a_data)
+        },
+        "token_b" => {
+            let feed_b = &mut ctx.accounts.feed_aggregator_b.load()?;
+            let feed_b_data:f64 =  feed_b.get_result()?.try_into()?;
+            msg!("price token b: {:?}", feed_b_data);
+            Ok(feed_b_data)
+        },
+        "token_c" => { 
+            let feed_c = &mut ctx.accounts.feed_aggregator_c.load()?;
+            let feed_c_data:f64 =  feed_c.get_result()?.try_into()?;
+            msg!("price token c: {:?}", feed_c_data);
+            Ok(feed_c_data)
+        },
+        "token_d" => {
+            let feed_d = &mut ctx.accounts.feed_aggregator_d.load()?;
+            let feed_d_data:f64 =  feed_d.get_result()?.try_into()?;
+            msg!("price token d: {:?}", feed_d_data);
+            Ok(feed_d_data)
+        },
+        "token_e" => {
+            let feed_e = &mut ctx.accounts.feed_aggregator_e.load()?;
+            let feed_e_data:f64 =  feed_e.get_result()?.try_into()?;
+            msg!("price token a: {:?}", feed_e_data);
+            Ok(feed_e_data)
+        },
+        _ => Err(CustomError::InvalidTokenName)
+    }
+}
