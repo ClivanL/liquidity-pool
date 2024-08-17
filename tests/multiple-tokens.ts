@@ -170,7 +170,7 @@ describe("multiple-tokens", () => {
   it("Add liquidity to pool B, add_liquidity_v2!", async () => {
     const tokenBVaultAddress = await getAssociatedTokenAddress(mintB, liquidityPoolPda,true);
 
-    const add = new BN(5);
+    const add = new BN(10);
     const [userTokenAccountPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("token_b"),user.publicKey.toBuffer()],program.programId);
     try{
       const userTokenAccount = await program.account.userAccount.fetch(userTokenAccountPda);
@@ -264,6 +264,67 @@ describe("multiple-tokens", () => {
     let newUserTokenBAccount = await program.account.userAccount.fetch(userTokenAccountBPda);
     let newTokenBAccountBalance = newUserTokenBAccount.balance as number;
     expect(newTokenBAccountBalance).to.equal(initialTokenBAccountBalance-stakeAmount+refundedValue); 
+  })
+
+  it("Init pending stake seed records", async()=>{
+    const tx = await program.methods.initPendingStakeSeedRecords().rpc();
+    const [pendingStakeRecordsPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("master_seed")],program.programId);
+    const pendingStakeRecords = await program.account.pendingStakeSeedRecords.fetch(pendingStakeRecordsPda);
+    expect(pendingStakeRecords.lastIndex).to.equal(0);
+  })
+
+  it("Stake tokens from token B account to exchange for lp token, with sufficient balance, with stake_tokens_v2", async()=>{
+    
+    const [userTokenAccountBPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("token_b"),user.publicKey.toBuffer()],program.programId);
+    const [pendingStakeRecordsPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("master_seed")],program.programId);
+
+    let pendingStakeRecords = await program.account.pendingStakeSeedRecords.fetch(pendingStakeRecordsPda);
+    const lastIndex = pendingStakeRecords.lastIndex;
+
+    let initialUserTokenBAccount = await program.account.userAccount.fetch(userTokenAccountBPda);
+    let initialTokenBAccountBalance = initialUserTokenBAccount.balance as number;
+    let initialTokenBAccountPendingStake = initialUserTokenBAccount.pendingStake as number;
+
+    let stakeAmount = 5.0
+
+    const switchboardProgram = await SwitchboardProgram.load(
+      new anchor.web3.Connection("https://api.devnet.solana.com"),
+      user,
+    );
+    const aggregatorAccountB = new AggregatorAccount(
+      switchboardProgram,
+      ORACLE_FEED_ADDRESS_B,
+    );
+
+    const prices:Big|null = await aggregatorAccountB.fetchLatestValue();
+    if (prices===null){
+      throw new Error("unable to read latest price from oracle");
+    }
+    let refundedValue = (stakeAmount*prices.toNumber() - Math.floor(stakeAmount*prices.toNumber()))/prices.toNumber();
+    
+    const [stakeTokenTransactionPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("pending_stake"),Buffer.from("s"+lastIndex)],program.programId)
+
+    const tx = await program.methods.stakeTokensV2(stakeAmount).accounts({
+      userTokenAccount:userTokenAccountBPda,
+      user:user.publicKey,
+      pendingStakeSeedRecords:pendingStakeRecordsPda,
+      stakeTokenTransaction:stakeTokenTransactionPda
+    }).signers([user]).rpc();
+    console.log(tx);
+
+    let newUserTokenBAccount = await program.account.userAccount.fetch(userTokenAccountBPda);
+    let newTokenBAccountBalance = newUserTokenBAccount.balance as number;
+    expect(newTokenBAccountBalance).to.equal(initialTokenBAccountBalance-stakeAmount+refundedValue);
+    let newTokenBAccountPendingStake = newUserTokenBAccount.pendingStake as number;
+    expect(newTokenBAccountPendingStake).to.equal(initialTokenBAccountPendingStake+stakeAmount-refundedValue);
+
+    let updatedPendingStakeRecords = await program.account.pendingStakeSeedRecords.fetch(pendingStakeRecordsPda);
+    expect(updatedPendingStakeRecords.lastIndex as number).to.equal(lastIndex+1);
+
+    let stakeTokenTransaction = await program.account.stakeTokenTransaction.fetch(stakeTokenTransactionPda);
+    expect(stakeTokenTransaction.exchangeRate as number).to.equal(prices.toNumber());
+    expect(stakeTokenTransaction.tokenName.toString()).to.equal("token_b");
+    expect(stakeTokenTransaction.stakeAmount as number).to.equal(stakeAmount-refundedValue);
   })
 
 });
