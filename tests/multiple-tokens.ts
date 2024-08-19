@@ -301,16 +301,15 @@ describe("multiple-tokens", () => {
       throw new Error("unable to read latest price from oracle");
     }
     let refundedValue = (stakeAmount*prices.toNumber() - Math.floor(stakeAmount*prices.toNumber()))/prices.toNumber();
-    
-    const [stakeTokenTransactionPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("pending_stake"),Buffer.from("s"+lastIndex)],program.programId)
 
-    const tx = await program.methods.stakeTokensV2(stakeAmount).accounts({
+    const tx = await program.methods.stakeTokensV2("s"+lastIndex,stakeAmount).accounts({
       userTokenAccount:userTokenAccountBPda,
       user:user.publicKey,
       pendingStakeSeedRecords:pendingStakeRecordsPda,
-      stakeTokenTransaction:stakeTokenTransactionPda
     }).signers([user]).rpc();
     console.log(tx);
+
+    const [stakeTokenTransactionPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("pending_stake"),Buffer.from("s"+lastIndex)],program.programId);
 
     let newUserTokenBAccount = await program.account.userAccount.fetch(userTokenAccountBPda);
     let newTokenBAccountBalance = newUserTokenBAccount.balance as number;

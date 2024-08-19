@@ -56,8 +56,8 @@ pub mod multiple_tokens {
         init_pending_stake_seed_records::handler(ctx)
     }
 
-    pub fn stake_tokens_v2(ctx: Context<StakeTokensV2>,stake_amount:f64) -> Result<()>{
-        stake_tokens_v2::handler(ctx,stake_amount)
+    pub fn stake_tokens_v2(ctx: Context<StakeTokensV2>, sub_seed:String, stake_amount:f64) -> Result<()>{
+        stake_tokens_v2::handler(ctx,sub_seed,stake_amount)
     }
 
 }

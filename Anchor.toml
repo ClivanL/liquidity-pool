@@ -3,6 +3,7 @@
 [features]
 resolution = true
 skip-lint = false
+seed = true
 
 [programs.localnet]
 multiple_tokens = "5Zw1iaBE6Wnn2ZiDoMANDvXGchyzA87hp9sJ9z1dEyMn"

@@ -5,7 +5,7 @@ use anchor_spl::token::{MintTo};
 use crate::errors::*;
 use crate::utils::*;
 
-pub fn handler(ctx: Context<StakeTokensV2>, stake_amount:f64) -> Result<()> {
+pub fn handler(ctx: Context<StakeTokensV2>, sub_seed:String,stake_amount:f64) -> Result<()> {
 
     //check exchange rate
     let user_token_account_copy = ctx.accounts.user_token_account.clone();

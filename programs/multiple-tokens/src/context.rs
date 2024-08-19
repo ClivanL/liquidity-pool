@@ -287,12 +287,17 @@ pub struct InitPendingStakeSeedRecords<'info>{
 }
 
 #[derive(Accounts)]
+#[instruction(sub_seed:String)]
 pub struct StakeTokensV2<'info> {
     #[account(mut)]
     pub user_token_account: Account<'info, UserAccount>,
     #[account(mut)]
     pub user: Signer<'info>,
     pub system_program: Program<'info, System>,
+    #[account(mut)]
+    pub pending_stake_seed_records: Account<'info,PendingStakeSeedRecords>,
+    #[account(init, payer=user, seeds=["pending_stake".as_bytes(), sub_seed.to_string().as_ref()],bump, space=8+StakeTokenTransaction::INIT_SPACE)]
+    pub stake_token_transaction: Account<'info,StakeTokenTransaction>,
     #[account(
         address = Pubkey::from_str(FEED_ADDRESS_XRPBEARUSDT).unwrap()
     )]
@@ -313,8 +318,4 @@ pub struct StakeTokensV2<'info> {
         address = Pubkey::from_str(FEED_ADDRESS_EOSBEARBUSD).unwrap()
     )]
     pub feed_aggregator_e: AccountLoader<'info, AggregatorAccountData>,
-    #[account(mut)]
-    pub pending_stake_seed_records: Account<'info,PendingStakeSeedRecords>,
-    #[account(init_if_needed, payer=user, seeds=["pending_stake".as_bytes(), ("s".to_owned()+&pending_stake_seed_records.last_index.to_string()).as_bytes()],bump, space=8+StakeTokenTransaction::INIT_SPACE)]
-    pub stake_token_transaction: Account<'info,StakeTokenTransaction>
 }
