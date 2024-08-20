@@ -27,7 +27,9 @@ pub enum CustomError {
     #[msg("Mathematical operation resulted in an invalid value")]
     InvalidValue,
     #[msg("Transaction initiator is not the owner.")]
-    InvalidOwner
+    InvalidOwner,
+    #[msg("Wrong account retrieved.")]
+    WrongAccountRetrieval
 }
 
 

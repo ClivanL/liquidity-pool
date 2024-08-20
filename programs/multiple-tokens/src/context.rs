@@ -319,3 +319,22 @@ pub struct StakeTokensV2<'info> {
     )]
     pub feed_aggregator_e: AccountLoader<'info, AggregatorAccountData>,
 }
+
+#[derive(Accounts)]
+pub struct ConfirmUserStake<'info> {
+    #[account(mut, close=initializer)]
+    pub pending_stake_seed_records: Account<'info,PendingStakeSeedRecords>,
+    #[account(mut)]
+    pub initializer: Signer<'info>,
+    pub system_program: Program<'info, System>,
+    pub rent: Sysvar<'info, Rent>,
+    pub token_program: Program<'info, Token>,
+    #[account(mut,seeds = ["lp_mint".as_bytes()], bump)]
+    pub lp_mint: Account<'info, Mint>,
+    #[account(mut)]
+    pub token_lp_vault: Account<'info, TokenAccount>,
+    #[account(mut)]
+    pub stake_records: Account<'info, StakeRecords>,
+    #[account(mut)]
+    pub liquidity_pool: Account<'info, LiquidityPool>,
+}
