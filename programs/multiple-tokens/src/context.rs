@@ -322,12 +322,13 @@ pub struct StakeTokensV2<'info> {
 
 #[derive(Accounts)]
 pub struct ConfirmUserStake<'info> {
-    #[account(mut, close=initializer)]
-    pub pending_stake_seed_records: Account<'info,PendingStakeSeedRecords>,
+    #[account(mut, close=user)]
+    pub stake_token_transaction: Account<'info,StakeTokenTransaction>,
     #[account(mut)]
-    pub initializer: Signer<'info>,
+    pub user_token_account: Account<'info, UserAccount>,
+    #[account(mut)]
+    pub user: Signer<'info>,
     pub system_program: Program<'info, System>,
-    pub rent: Sysvar<'info, Rent>,
     pub token_program: Program<'info, Token>,
     #[account(mut,seeds = ["lp_mint".as_bytes()], bump)]
     pub lp_mint: Account<'info, Mint>,
@@ -335,6 +336,8 @@ pub struct ConfirmUserStake<'info> {
     pub token_lp_vault: Account<'info, TokenAccount>,
     #[account(mut)]
     pub stake_records: Account<'info, StakeRecords>,
-    #[account(mut)]
+    #[account(mut)] 
     pub liquidity_pool: Account<'info, LiquidityPool>,
+    #[account(init_if_needed, payer = user, seeds=["lp_token".as_bytes(),user.key().as_ref()],bump, space = 8+UserAccount::INIT_SPACE)]
+    pub user_lp_token_account: Account<'info, UserAccount>,
 }
