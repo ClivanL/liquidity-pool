@@ -60,6 +60,10 @@ pub mod multiple_tokens {
         stake_tokens_v2::handler(ctx,sub_seed,stake_amount)
     }
 
+    pub fn confirm_user_stake(ctx:Context<ConfirmUserStake>) -> Result<()>{
+        confirm_user_stake::handler(ctx)
+    }
+
 }
 
 

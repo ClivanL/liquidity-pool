@@ -326,4 +326,9 @@ describe("multiple-tokens", () => {
     expect(stakeTokenTransaction.stakeAmount as number).to.equal(stakeAmount-refundedValue);
   })
 
+  // it("Test confirm user stake function, which will be ran by clockwork", async()=>{
+    
+    
+  // })
+
 });

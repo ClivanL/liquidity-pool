@@ -9,6 +9,7 @@ pub mod stake_tokens;
 pub mod stake_tokens_v2;
 pub mod create_lp_token_vault;
 pub mod init_pending_stake_seed_records;
+pub mod confirm_user_stake;
 
 pub use add_liquidity::*;
 pub use add_liquidity_v2::*;
@@ -21,5 +22,6 @@ pub use stake_tokens::*;
 pub use stake_tokens_v2::*;
 pub use create_lp_token_vault::*;
 pub use init_pending_stake_seed_records::*;
+pub use confirm_user_stake::*;
 
 
