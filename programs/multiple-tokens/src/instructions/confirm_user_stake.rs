@@ -41,9 +41,12 @@ pub fn handler(ctx: Context<ConfirmUserStake>) -> Result<()> {
     let liquidity_pool = &mut ctx.accounts.liquidity_pool;
     liquidity_pool.total_lp_supply+=stake_token_transaction.tokens_to_mint as f64;
 
-    user_lp_token_account.token_name = "lp_token".into();
+    //user_lp_token_account.token_name = "lp_token".into();
+    if user_lp_token_account.user != stake_token_transaction.user_pubkey {
+        return Err(CustomError::WrongAccountRetrieval.into());
+    }
     user_lp_token_account.balance += stake_token_transaction.tokens_to_mint as f64;
-    user_lp_token_account.user = stake_token_transaction.user_pubkey;
+    //user_lp_token_account.user = stake_token_transaction.user_pubkey;
 
     let staked_tokens = user_token_account.pending_stake;
     user_token_account.pending_stake = 0.0;

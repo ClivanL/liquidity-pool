@@ -298,6 +298,8 @@ pub struct StakeTokensV2<'info> {
     pub pending_stake_seed_records: Account<'info,PendingStakeSeedRecords>,
     #[account(init, payer=user, seeds=["pending_stake".as_bytes(), sub_seed.to_string().as_ref()],bump, space=8+StakeTokenTransaction::INIT_SPACE)]
     pub stake_token_transaction: Account<'info,StakeTokenTransaction>,
+    #[account(init_if_needed, payer = user, seeds=["lp_token".as_bytes(),user.key().as_ref()],bump, space = 8+UserAccount::INIT_SPACE)]
+    pub user_lp_token_account: Account<'info, UserAccount>,
     #[account(
         address = Pubkey::from_str(FEED_ADDRESS_XRPBEARUSDT).unwrap()
     )]
@@ -338,6 +340,6 @@ pub struct ConfirmUserStake<'info> {
     pub stake_records: Account<'info, StakeRecords>,
     #[account(mut)] 
     pub liquidity_pool: Account<'info, LiquidityPool>,
-    #[account(init_if_needed, payer = user, seeds=["lp_token".as_bytes(),user.key().as_ref()],bump, space = 8+UserAccount::INIT_SPACE)]
+    #[account(mut)]
     pub user_lp_token_account: Account<'info, UserAccount>,
 }

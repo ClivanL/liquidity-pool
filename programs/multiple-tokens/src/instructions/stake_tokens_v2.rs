@@ -5,7 +5,7 @@ use anchor_spl::token::{MintTo};
 use crate::errors::*;
 use crate::utils::*;
 
-pub fn handler(ctx: Context<StakeTokensV2>, sub_seed:String,stake_amount:f64) -> Result<()> {
+pub fn handler(ctx: Context<StakeTokensV2>, _sub_seed:String,stake_amount:f64) -> Result<()> {
 
     //check exchange rate
     let user_token_account_copy = ctx.accounts.user_token_account.clone();
@@ -67,6 +67,11 @@ pub fn handler(ctx: Context<StakeTokensV2>, sub_seed:String,stake_amount:f64) ->
     sub_seeds.push(new_seed);
     pending_stake_seed_records.last_index+=1;
     }
+
+    let user_lp_token_account = &mut ctx.accounts.user_lp_token_account;
+    user_lp_token_account.user = ctx.accounts.user.key();
+    user_lp_token_account.balance = 0.0;
+    user_lp_token_account.token_name = "lp_token".into();
     
     Ok(())
 }
