@@ -329,7 +329,8 @@ pub struct ConfirmUserStake<'info> {
     #[account(mut)]
     pub user_token_account: Account<'info, UserAccount>,
     #[account(mut)]
-    pub user: Signer<'info>,
+    /// CHECK: pubkey will be counterchecked with stake_token_transaction before refunding rent to user
+    pub user: AccountInfo<'info>,
     pub system_program: Program<'info, System>,
     pub token_program: Program<'info, Token>,
     #[account(mut,seeds = ["lp_mint".as_bytes()], bump)]

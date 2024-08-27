@@ -357,6 +357,20 @@ describe("multiple-tokens", () => {
       const [userLpTokenAccountPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("lp_token"),stakeTokenTransaction.userPubkey.toBuffer()],program.programId);
       let userLpTokenAccount = await program.account.userAccount.fetch(userLpTokenAccountPda);
       console.log(userLpTokenAccount);
+      const [userTokenAccountPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from(stakeTokenTransaction.tokenName),stakeTokenTransaction.userPubkey.toBuffer()],program.programId);
+      const [stakeRecordsPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("stake_records")],program.programId);
+      const lpTokenVaultAddress = await getAssociatedTokenAddress(lpMintPda, liquidityPoolPda,true);
+      const tx = await program.methods.confirmUserStake().accounts({
+        stakeTokenTransaction:stakeTokenTransactionPda,
+        userTokenAccount:userTokenAccountPda,
+        user: stakeTokenTransaction.userPubkey,
+        lpMint:lpMintPda,
+        tokenLpVault:lpTokenVaultAddress,
+        stakeRecords:stakeRecordsPda,
+        liquidityPool:liquidityPoolPda,
+        userLpTokenAccount:userLpTokenAccountPda
+      }).rpc();
+      console.log(tx)
     }
   })
 
