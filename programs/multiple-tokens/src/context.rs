@@ -343,4 +343,25 @@ pub struct ConfirmUserStake<'info> {
     pub liquidity_pool: Account<'info, LiquidityPool>,
     #[account(mut)]
     pub user_lp_token_account: Account<'info, UserAccount>,
+    #[account(signer, constraint = thread.authority.eq(&thread_authority.key()))]
+    pub thread: Account<'info, Thread>,
+    #[account(seeds = [THREAD_AUTHORITY_SEED], bump)]
+    pub thread_authority: SystemAccount<'info>,
+}
+
+
+#[derive(Accounts)]
+#[instruction(thread_id: Vec <u8>)]
+pub struct Initialize<'info> {
+    #[account(mut)]
+    pub pending_stake_seed_records: Account<'info,PendingStakeSeedRecords>
+    #[account(mut)]
+    pub executor: Signer<'info>,
+    #[account(address = clockwork_sdk::ID)]
+    pub clockwork_program: Program<'info, clockwork_sdk::ThreadProgram>,
+    pub system_program: Program<'info, System>,
+    #[account(mut, address = Thread::pubkey(thread_authority.key(), thread_id))]
+    pub thread: SystemAccount<'info>,
+    #[account(seeds = [THREAD_AUTHORITY_SEED], bump)]
+    pub thread_authority: SystemAccount<'info>,
 }
