@@ -343,4 +343,86 @@ pub struct ConfirmUserStake<'info> {
     pub liquidity_pool: Account<'info, LiquidityPool>,
     #[account(mut)]
     pub user_lp_token_account: Account<'info, UserAccount>,
+    // #[account(signer, constraint = thread.authority.eq(&thread_authority.key()))]
+    // pub thread: Account<'info, Thread>,
+    // #[account(seeds = [THREAD_AUTHORITY_SEED], bump)]
+    // pub thread_authority: SystemAccount<'info>,
+}
+
+
+// #[derive(Accounts)]
+// #[instruction(thread_id: Vec <u8>)]
+// pub struct Initialize<'info> {
+//     #[account(mut)]
+//     pub pending_stake_seed_records: Account<'info,PendingStakeSeedRecords>,
+//     #[account(mut)]
+//     pub executor: Signer<'info>,
+//     #[account(address = clockwork_sdk::ID)]
+//     pub clockwork_program: Program<'info, clockwork_sdk::ThreadProgram>,
+//     pub system_program: Program<'info, System>,
+//     // #[account(mut, address = Thread::pubkey(thread_authority.key(), thread_id))]
+//     // pub thread: SystemAccount<'info>,
+//     // #[account(seeds = [THREAD_AUTHORITY_SEED], bump)]
+//     // pub thread_authority: SystemAccount<'info>,
+// }
+
+#[derive(Accounts)]
+pub struct ConfirmUserStakePartA<'info> {
+    #[account(mut)]
+    pub pending_stake_seed_records: Account<'info,PendingStakeSeedRecords>,
+    pub system_program: Program<'info, System>,
+    #[account(mut)]
+    pub stake_token_transaction: Account<'info, StakeTokenTransaction>,
+    #[account(mut,seeds = ["lp_mint".as_bytes()], bump)]
+    pub lp_mint: Account<'info, Mint>,
+    #[account(mut)]
+    pub token_lp_vault: Account<'info, TokenAccount>,
+    #[account(mut)]
+    pub stake_records: Account<'info, StakeRecords>,
+    #[account(mut)] 
+    pub liquidity_pool: Account<'info, LiquidityPool>,
+    #[account(mut)]
+    pub initializer: Signer<'info>,
+    #[account(mut)]
+    pub stake_token_transaction_pda:Account<'info,PubkeyHolder>
+}
+
+#[derive(Accounts)]
+#[instruction(sub_seed:String)]
+pub struct ConfirmUserStakePartB<'info> {
+    pub system_program: Program<'info, System>,
+    #[account(init_if_needed, payer=initializer, seeds = [b"pending_stake", sub_seed.as_bytes()], bump, space=8+StakeTokenTransaction::INIT_SPACE)]
+    pub stake_token_transaction: Account<'info,StakeTokenTransaction>,
+    #[account(mut)]
+    pub initializer: Signer<'info>,
+
+    #[account(mut,seeds = ["lp_mint".as_bytes()], bump)]
+    pub lp_mint: Account<'info, Mint>,
+    #[account(mut)]
+    pub token_lp_vault: Account<'info, TokenAccount>,
+    #[account(mut)]
+    pub stake_records: Account<'info, StakeRecords>,
+    #[account(mut)] 
+    pub liquidity_pool: Account<'info, LiquidityPool>,
+}
+
+#[derive(Accounts)]
+pub struct ConfirmUserStakePartC<'info> {
+    pub system_program: Program<'info, System>,
+    #[account(mut, close=user)]
+    pub stake_token_transaction: Account<'info,StakeTokenTransaction>,
+    /// CHECK: pubkey will be counterchecked with stake_token_transaction before refunding rent to user
+    pub user: AccountInfo<'info>,
+    #[account(mut)]
+    pub user_lp_token_account: Account<'info, UserAccount>,
+
+    pub token_program: Program<'info, Token>,
+    #[account(mut,seeds = ["lp_mint".as_bytes()], bump)]
+    pub lp_mint: Account<'info, Mint>,
+    #[account(mut)]
+    pub token_lp_vault: Account<'info, TokenAccount>,
+    #[account(mut)]
+    pub stake_records: Account<'info, StakeRecords>,
+    #[account(mut)] 
+    pub liquidity_pool: Account<'info, LiquidityPool>,
 }

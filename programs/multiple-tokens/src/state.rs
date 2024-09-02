@@ -80,3 +80,8 @@ pub struct StakeTokenTransaction{
 impl StakeTokenTransaction{
     pub const INIT_SPACE:usize = F64_SIZE+U64_SIZE+F64_SIZE+TOKEN_NAME_SIZE+PUBKEY_SIZE;
 }
+
+#[account]
+pub struct PubkeyHolder {
+    pub pubkey: Pubkey,
+}
