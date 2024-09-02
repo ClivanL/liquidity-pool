@@ -366,63 +366,63 @@ pub struct ConfirmUserStake<'info> {
 //     // pub thread_authority: SystemAccount<'info>,
 // }
 
-#[derive(Accounts)]
-pub struct ConfirmUserStakePartA<'info> {
-    #[account(mut)]
-    pub pending_stake_seed_records: Account<'info,PendingStakeSeedRecords>,
-    pub system_program: Program<'info, System>,
-    #[account(mut)]
-    pub stake_token_transaction: Account<'info, StakeTokenTransaction>,
-    #[account(mut,seeds = ["lp_mint".as_bytes()], bump)]
-    pub lp_mint: Account<'info, Mint>,
-    #[account(mut)]
-    pub token_lp_vault: Account<'info, TokenAccount>,
-    #[account(mut)]
-    pub stake_records: Account<'info, StakeRecords>,
-    #[account(mut)] 
-    pub liquidity_pool: Account<'info, LiquidityPool>,
-    #[account(mut)]
-    pub initializer: Signer<'info>,
-    #[account(mut)]
-    pub stake_token_transaction_pda:Account<'info,PubkeyHolder>
-}
+// #[derive(Accounts)]
+// pub struct ConfirmUserStakePartA<'info> {
+//     #[account(mut)]
+//     pub pending_stake_seed_records: Account<'info,PendingStakeSeedRecords>,
+//     pub system_program: Program<'info, System>,
+//     #[account(mut)]
+//     pub stake_token_transaction: Account<'info, StakeTokenTransaction>,
+//     #[account(mut,seeds = ["lp_mint".as_bytes()], bump)]
+//     pub lp_mint: Account<'info, Mint>,
+//     #[account(mut)]
+//     pub token_lp_vault: Account<'info, TokenAccount>,
+//     #[account(mut)]
+//     pub stake_records: Account<'info, StakeRecords>,
+//     #[account(mut)] 
+//     pub liquidity_pool: Account<'info, LiquidityPool>,
+//     #[account(mut)]
+//     pub initializer: Signer<'info>,
+//     #[account(mut)]
+//     pub stake_token_transaction_pda:Account<'info,PubkeyHolder>
+// }
 
-#[derive(Accounts)]
-#[instruction(sub_seed:String)]
-pub struct ConfirmUserStakePartB<'info> {
-    pub system_program: Program<'info, System>,
-    #[account(init_if_needed, payer=initializer, seeds = [b"pending_stake", sub_seed.as_bytes()], bump, space=8+StakeTokenTransaction::INIT_SPACE)]
-    pub stake_token_transaction: Account<'info,StakeTokenTransaction>,
-    #[account(mut)]
-    pub initializer: Signer<'info>,
+// #[derive(Accounts)]
+// #[instruction(sub_seed:String)]
+// pub struct ConfirmUserStakePartB<'info> {
+//     pub system_program: Program<'info, System>,
+//     #[account(init_if_needed, payer=initializer, seeds = [b"pending_stake", sub_seed.as_bytes()], bump, space=8+StakeTokenTransaction::INIT_SPACE)]
+//     pub stake_token_transaction: Account<'info,StakeTokenTransaction>,
+//     #[account(mut)]
+//     pub initializer: Signer<'info>,
 
-    #[account(mut,seeds = ["lp_mint".as_bytes()], bump)]
-    pub lp_mint: Account<'info, Mint>,
-    #[account(mut)]
-    pub token_lp_vault: Account<'info, TokenAccount>,
-    #[account(mut)]
-    pub stake_records: Account<'info, StakeRecords>,
-    #[account(mut)] 
-    pub liquidity_pool: Account<'info, LiquidityPool>,
-}
+//     #[account(mut,seeds = ["lp_mint".as_bytes()], bump)]
+//     pub lp_mint: Account<'info, Mint>,
+//     #[account(mut)]
+//     pub token_lp_vault: Account<'info, TokenAccount>,
+//     #[account(mut)]
+//     pub stake_records: Account<'info, StakeRecords>,
+//     #[account(mut)] 
+//     pub liquidity_pool: Account<'info, LiquidityPool>,
+// }
 
-#[derive(Accounts)]
-pub struct ConfirmUserStakePartC<'info> {
-    pub system_program: Program<'info, System>,
-    #[account(mut, close=user)]
-    pub stake_token_transaction: Account<'info,StakeTokenTransaction>,
-    /// CHECK: pubkey will be counterchecked with stake_token_transaction before refunding rent to user
-    pub user: AccountInfo<'info>,
-    #[account(mut)]
-    pub user_lp_token_account: Account<'info, UserAccount>,
+// #[derive(Accounts)]
+// pub struct ConfirmUserStakePartC<'info> {
+//     pub system_program: Program<'info, System>,
+//     #[account(mut, close=user)]
+//     pub stake_token_transaction: Account<'info,StakeTokenTransaction>,
+//     /// CHECK: pubkey will be counterchecked with stake_token_transaction before refunding rent to user
+//     pub user: AccountInfo<'info>,
+//     #[account(mut)]
+//     pub user_lp_token_account: Account<'info, UserAccount>,
 
-    pub token_program: Program<'info, Token>,
-    #[account(mut,seeds = ["lp_mint".as_bytes()], bump)]
-    pub lp_mint: Account<'info, Mint>,
-    #[account(mut)]
-    pub token_lp_vault: Account<'info, TokenAccount>,
-    #[account(mut)]
-    pub stake_records: Account<'info, StakeRecords>,
-    #[account(mut)] 
-    pub liquidity_pool: Account<'info, LiquidityPool>,
-}
+//     pub token_program: Program<'info, Token>,
+//     #[account(mut,seeds = ["lp_mint".as_bytes()], bump)]
+//     pub lp_mint: Account<'info, Mint>,
+//     #[account(mut)]
+//     pub token_lp_vault: Account<'info, TokenAccount>,
+//     #[account(mut)]
+//     pub stake_records: Account<'info, StakeRecords>,
+//     #[account(mut)] 
+//     pub liquidity_pool: Account<'info, LiquidityPool>,
+// }

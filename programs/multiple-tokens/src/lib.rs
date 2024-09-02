@@ -64,9 +64,9 @@ pub mod multiple_tokens {
         confirm_user_stake::handler(ctx)
     }
 
-    pub fn confirm_user_stake_part_a(ctx:Context<ConfirmUserStakePartA>) -> Result<()> {
-        confirm_user_stake_part_a::handler(ctx)
-    }
+    // pub fn confirm_user_stake_part_a(ctx:Context<ConfirmUserStakePartA>) -> Result<()> {
+    //     confirm_user_stake_part_a::handler(ctx)
+    // }
     
 
 }

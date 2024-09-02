@@ -326,52 +326,52 @@ describe("multiple-tokens", () => {
     expect(stakeTokenTransaction.stakeAmount as number).to.equal(stakeAmount-refundedValue);
   })
 
-  it("Test confirm user stake function, which will be ran by clockwork", async()=>{
-    // #[account(mut, close=user)]
-    // pub stake_token_transaction: Account<'info,StakeTokenTransaction>,
-    // #[account(mut)]
-    // pub user_token_account: Account<'info, UserAccount>,
-    // #[account(mut)]
-    // pub user: Signer<'info>,
-    // pub system_program: Program<'info, System>,
-    // pub token_program: Program<'info, Token>,
-    // #[account(mut,seeds = ["lp_mint".as_bytes()], bump)]
-    // pub lp_mint: Account<'info, Mint>,
-    // #[account(mut)]
-    // pub token_lp_vault: Account<'info, TokenAccount>,
-    // #[account(mut)]
-    // pub stake_records: Account<'info, StakeRecords>,
-    // #[account(mut)] 
-    // pub liquidity_pool: Account<'info, LiquidityPool>,
-    // #[account(init_if_needed, payer = user, seeds=["lp_token".as_bytes(),user.key().as_ref()],bump, space = 8+UserAccount::INIT_SPACE)]
-    // pub user_lp_token_account: Account<'info, UserAccount>,
-    const [pendingStakeSeedRecordsPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("master_seed")],program.programId);
-    let pendingStakeSeedRecords = await program.account.pendingStakeSeedRecords.fetch(pendingStakeSeedRecordsPda);
-    let subSeeds = pendingStakeSeedRecords.subSeeds;
-    console.log(subSeeds);
-    for(const subSeed of subSeeds){
-      const [stakeTokenTransactionPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("pending_stake"), Buffer.from(subSeed)], program.programId);
-      let stakeTokenTransaction = await program.account.stakeTokenTransaction.fetch(stakeTokenTransactionPda);
-      console.log(stakeTokenTransaction);
-      console.log(stakeTokenTransaction.userPubkey.toString());
-      const [userLpTokenAccountPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("lp_token"),stakeTokenTransaction.userPubkey.toBuffer()],program.programId);
-      let userLpTokenAccount = await program.account.userAccount.fetch(userLpTokenAccountPda);
-      console.log(userLpTokenAccount);
-      const [userTokenAccountPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from(stakeTokenTransaction.tokenName),stakeTokenTransaction.userPubkey.toBuffer()],program.programId);
-      const [stakeRecordsPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("stake_records")],program.programId);
-      const lpTokenVaultAddress = await getAssociatedTokenAddress(lpMintPda, liquidityPoolPda,true);
-      const tx = await program.methods.confirmUserStake().accounts({
-        stakeTokenTransaction:stakeTokenTransactionPda,
-        userTokenAccount:userTokenAccountPda,
-        user: stakeTokenTransaction.userPubkey,
-        lpMint:lpMintPda,
-        tokenLpVault:lpTokenVaultAddress,
-        stakeRecords:stakeRecordsPda,
-        liquidityPool:liquidityPoolPda,
-        userLpTokenAccount:userLpTokenAccountPda
-      }).rpc();
-      console.log(tx)
-    }
-  })
+  // it("Test confirm user stake function, which will be ran by clockwork", async()=>{
+  //   // #[account(mut, close=user)]
+  //   // pub stake_token_transaction: Account<'info,StakeTokenTransaction>,
+  //   // #[account(mut)]
+  //   // pub user_token_account: Account<'info, UserAccount>,
+  //   // #[account(mut)]
+  //   // pub user: Signer<'info>,
+  //   // pub system_program: Program<'info, System>,
+  //   // pub token_program: Program<'info, Token>,
+  //   // #[account(mut,seeds = ["lp_mint".as_bytes()], bump)]
+  //   // pub lp_mint: Account<'info, Mint>,
+  //   // #[account(mut)]
+  //   // pub token_lp_vault: Account<'info, TokenAccount>,
+  //   // #[account(mut)]
+  //   // pub stake_records: Account<'info, StakeRecords>,
+  //   // #[account(mut)] 
+  //   // pub liquidity_pool: Account<'info, LiquidityPool>,
+  //   // #[account(init_if_needed, payer = user, seeds=["lp_token".as_bytes(),user.key().as_ref()],bump, space = 8+UserAccount::INIT_SPACE)]
+  //   // pub user_lp_token_account: Account<'info, UserAccount>,
+  //   const [pendingStakeSeedRecordsPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("master_seed")],program.programId);
+  //   let pendingStakeSeedRecords = await program.account.pendingStakeSeedRecords.fetch(pendingStakeSeedRecordsPda);
+  //   let subSeeds = pendingStakeSeedRecords.subSeeds;
+  //   console.log(subSeeds);
+  //   for(const subSeed of subSeeds){
+  //     const [stakeTokenTransactionPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("pending_stake"), Buffer.from(subSeed)], program.programId);
+  //     let stakeTokenTransaction = await program.account.stakeTokenTransaction.fetch(stakeTokenTransactionPda);
+  //     console.log(stakeTokenTransaction);
+  //     console.log(stakeTokenTransaction.userPubkey.toString());
+  //     const [userLpTokenAccountPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("lp_token"),stakeTokenTransaction.userPubkey.toBuffer()],program.programId);
+  //     let userLpTokenAccount = await program.account.userAccount.fetch(userLpTokenAccountPda);
+  //     console.log(userLpTokenAccount);
+  //     const [userTokenAccountPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from(stakeTokenTransaction.tokenName),stakeTokenTransaction.userPubkey.toBuffer()],program.programId);
+  //     const [stakeRecordsPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("stake_records")],program.programId);
+  //     const lpTokenVaultAddress = await getAssociatedTokenAddress(lpMintPda, liquidityPoolPda,true);
+  //     const tx = await program.methods.confirmUserStake().accounts({
+  //       stakeTokenTransaction:stakeTokenTransactionPda,
+  //       userTokenAccount:userTokenAccountPda,
+  //       user: stakeTokenTransaction.userPubkey,
+  //       lpMint:lpMintPda,
+  //       tokenLpVault:lpTokenVaultAddress,
+  //       stakeRecords:stakeRecordsPda,
+  //       liquidityPool:liquidityPoolPda,
+  //       userLpTokenAccount:userLpTokenAccountPda
+  //     }).rpc();
+  //     console.log(tx)
+  //   }
+  // })
 
 });
