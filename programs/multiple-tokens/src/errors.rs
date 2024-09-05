@@ -29,7 +29,11 @@ pub enum CustomError {
     #[msg("Transaction initiator is not the owner.")]
     InvalidOwner,
     #[msg("Wrong account retrieved.")]
-    WrongAccountRetrieval
+    WrongAccountRetrieval,
+    #[msg("The token pair does not exist.")]
+    InvalidTokenPair,
+    #[msg("The direction does not exist.")]
+    WrongDirectionInput,
 }
 
 

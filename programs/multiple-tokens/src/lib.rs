@@ -5,6 +5,7 @@ pub mod state;
 pub mod utils;
 pub mod constants;
 pub mod config;
+pub mod enums;
 
 use anchor_lang::prelude::*;
 

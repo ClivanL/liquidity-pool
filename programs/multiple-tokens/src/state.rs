@@ -1,5 +1,6 @@
 use anchor_lang::prelude::*;
 use crate::constants::*;
+use crate::enums::*;
 
 #[account]
 pub struct LiquidityPool {
@@ -84,4 +85,30 @@ impl StakeTokenTransaction{
 #[account]
 pub struct PubkeyHolder {
     pub pubkey: Pubkey,
+}
+
+#[account]
+pub struct OrderBook {
+    pub last_index:u8,
+    pub token_pair:TokenPair,
+    pub direction:Direction
+}
+
+impl OrderBook {
+    pub const INIT_SPACE:usize = U8_SIZE + ENUM_SIZE + ENUM_SIZE;
+}
+
+#[account]
+pub struct LimitOrder {
+    pub user: Pubkey,
+    pub amount_to_trade: f64,
+    pub exchange_rate: f64,
+    pub created_at: i64,
+    pub token_pair: TokenPair,
+    pub closed: bool,
+    pub direction: Direction
+}
+
+impl LimitOrder{
+    pub const INIT_SPACE:usize = PUBKEY_SIZE + F64_SIZE + F64_SIZE + I64_SIZE + ENUM_SIZE + BOOL_SIZE + ENUM_SIZE;
 }

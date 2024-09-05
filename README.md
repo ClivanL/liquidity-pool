@@ -36,11 +36,11 @@
 - Order book
 #### Process
 ##### Buy limit order
-- Retrieve latest index from OrderBook Account (last_index), seed:orderbook, `token-pair`, purchase
-- PurchaseOrder Account created (user_pubkey, quantity, price, datetime,from-token, to-token, closed:boolean), seed: orderbook, order+index
+- Retrieve latest index from OrderBook Account (last_index), seed:orderbook, `token-pair`, buy
+- PurchaseOrder Account created (user, amount_to_trade, exchange_rate, created_at , token_pair, closed:boolean), seed: order, buy, order+index
 ##### Sell limit order
-- Retrieve latest index from OrderBook Account (last_index), seed:orderbook, `token-pair`, sale
-- SaleOrder Account created (user_pubkey, quantity, price, datetime,from-token, to-token, closed:boolean), seed: orderbook, order+index
+- Retrieve latest index from OrderBook Account (last_index), seed:orderbook, `token-pair`, sell
+- SaleOrder Account created (user_pubkey, quantity, price, datetime,from-token, to-token, closed:boolean), seed: order, sell, order+index
 ##### Processing
 - Retrieve OrderBook Account for purchase (Solution: clockwork)
 - Loop from first index until last index for SaleOrder, skip if closed is true, if price for saleorder < price for purchase order, fulfil order, update both orderbooks, update quantity, closed
