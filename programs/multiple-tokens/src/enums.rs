@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 use crate::errors::*;
-use core::str::FromStr;
+use std::str::FromStr;
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, PartialEq)]
 pub enum TokenPair {

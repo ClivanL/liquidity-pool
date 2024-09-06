@@ -433,7 +433,7 @@ pub struct ConfirmUserStake<'info> {
 #[derive(Accounts)]
 #[instruction(token_pair:String, direction:String)]
 pub struct CreateOrderBook<'info>{
-    #[account(init, payer=initializer, seeds = [b"orderbook",token_pair.to_string().as_bytes(),direction.to_string().as_bytes()],bump, space = 8+OrderBook::INIT_SPACE)]
+    #[account(init, payer=initializer, seeds = [b"orderbook",token_pair.as_bytes(),direction.as_bytes()],bump, space = 8+OrderBook::INIT_SPACE)]
     pub order_book: Account<'info,OrderBook>,
     #[account(mut)]
     pub initializer: Signer<'info>,

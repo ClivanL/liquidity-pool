@@ -68,7 +68,9 @@ pub mod multiple_tokens {
     // pub fn confirm_user_stake_part_a(ctx:Context<ConfirmUserStakePartA>) -> Result<()> {
     //     confirm_user_stake_part_a::handler(ctx)
     // }
-    
+    pub fn create_order_book(ctx:Context<CreateOrderBook>,token_pair:String, direction:String) -> Result<()> {
+        create_order_book::handler(ctx, token_pair, direction)
+    }
 
 }
 

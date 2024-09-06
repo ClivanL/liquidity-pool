@@ -12,6 +12,7 @@ pub mod init_pending_stake_seed_records;
 pub mod confirm_user_stake;
 // pub mod confirm_user_stake_part_a;
 // pub mod confirm_user_stake_part_b;
+pub mod create_order_book;
 
 pub use add_liquidity::*;
 pub use add_liquidity_v2::*;
@@ -27,5 +28,6 @@ pub use init_pending_stake_seed_records::*;
 pub use confirm_user_stake::*;
 // pub use confirm_user_stake_part_a::*;
 // pub use confirm_user_stake_part_b::*;
+pub use create_order_book::*;
 
 
