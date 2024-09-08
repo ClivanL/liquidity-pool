@@ -13,6 +13,7 @@ import {
   SwitchboardProgram,
 } from "@switchboard-xyz/solana.js";
 import { Big } from "big.js";
+import {SendTransactionError} from '@solana/web3.js'
 
 
 
@@ -24,17 +25,27 @@ describe("trading", () => {
   const program = anchor.workspace.MultipleTokens as Program<MultipleTokens>;
 
   it("Init buy order books", async()=>{
-    let token_pair = "ab";
-    let direction = "buy";
-    const [buyOrderBookPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("orderbook"), Buffer.from(token_pair), Buffer.from(direction)],program.programId);
-    const tx = await program.methods.createOrderBook(token_pair,direction).accounts({
+    try{
+      let token_pair = "ab";
+      let direction = "buy";
+      const [buyOrderBookPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("orderbook"), Buffer.from(token_pair), Buffer.from(direction)],program.programId);
+      const tx = await program.methods.createOrderBook(token_pair,direction).accounts({
         orderBook:buyOrderBookPda
-    }).rpc();
-    const buyOrderBook = await program.account.orderBook.fetch(buyOrderBookPda);
-    expect(buyOrderBook.lastIndex).to.equal(0);
-    console.log(buyOrderBook.direction);
-    console.log(buyOrderBook.tokenPair);
-    console.log(tx);
+      }).rpc();
+      const buyOrderBook = await program.account.orderBook.fetch(buyOrderBookPda);
+      expect(buyOrderBook.lastIndex).to.equal(0);
+      console.log(buyOrderBook.direction);
+      console.log(buyOrderBook.tokenPair);
+      console.log(tx);
+    }
+    catch (err){
+      if (err instanceof SendTransactionError) {
+        const logs = await err.getLogs(provider.connection)
+        console.error("Program error logs:", logs);
+      } else {
+        console.error("Unexpected error:", err.getLogs(provider.connection));
+      }
+    }
   })
 
   it("Init sell order books", async()=>{

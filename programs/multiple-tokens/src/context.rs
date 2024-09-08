@@ -440,11 +440,14 @@ pub struct CreateOrderBook<'info>{
     pub system_program: Program<'info, System>,
 }
 
-//WIP
-// #[derive(Accounts)]
-// #[instruction(direction:String, sub_seed:String)]
-// pub struct CreateLimitOrder<'info>{
-//     #[account(init, payer=user, seeds = [b"order",direction.to_string().as_ref(),sub_seed.to_string().as_ref()],bump, space = 8+LimitOrder::INIT_SPACE)]
-//     pub limit_order: Account<'info,LimitOrder>
-
-// }
+#[derive(Accounts)]
+#[instruction(direction:String, sub_seed:String)]
+pub struct CreateLimitOrder<'info>{
+    #[account(init, payer=user, seeds = [b"order",direction.as_bytes(),sub_seed.as_bytes()],bump, space = 8+LimitOrder::INIT_SPACE)]
+    pub limit_order: Account<'info,LimitOrder>,
+    #[account(mut)]
+    pub order_book: Account<'info,OrderBook>,
+    #[account(mut)]
+    pub user: Signer<'info>,
+    pub system_program: Program<'info, System>,
+}

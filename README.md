@@ -36,10 +36,10 @@
 - Order book
 #### Process
 ##### Buy limit order
-- Retrieve latest index from OrderBook Account (last_index), seed:orderbook, `token-pair`, buy
+- Retrieve latest index from OrderBook Account (last_index, orders(Vec), direction, token-pair), seed:orderbook, `token-pair`, buy
 - PurchaseOrder Account created (user, amount_to_trade, exchange_rate, created_at , token_pair, closed:boolean), seed: order, buy, order+index
 ##### Sell limit order
-- Retrieve latest index from OrderBook Account (last_index), seed:orderbook, `token-pair`, sell
+- Retrieve latest index from OrderBook Account (last_index, orders(Vec), direction, token-pair), seed:orderbook, `token-pair`, sell
 - SaleOrder Account created (user_pubkey, quantity, price, datetime,from-token, to-token, closed:boolean), seed: order, sell, order+index
 ##### Processing
 - Retrieve OrderBook Account for purchase (Solution: clockwork)

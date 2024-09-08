@@ -7,3 +7,5 @@ pub const SUB_SEEDS_VECTOR_SIZE: usize = 1050;
 pub const I64_SIZE: usize = 8;
 pub const BOOL_SIZE: usize = 1;
 pub const ENUM_SIZE: usize = 1;
+pub const LIMIT_ORDER_VECTOR_SIZE:usize = 200;
+pub const MAX_ORDERS:i32 = 15;

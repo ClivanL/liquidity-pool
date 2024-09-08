@@ -36,6 +36,10 @@ impl FromStr for TokenPair {
     }
 }
 
+impl Space for TokenPair {
+    const INIT_SPACE: usize = 1;
+}
+
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, PartialEq)]
 pub enum Direction {
     Buy,
@@ -52,4 +56,8 @@ impl FromStr for Direction {
             _ => Err(CustomError::WrongDirectionInput.into())
         }
     }
+}
+
+impl Space for Direction {
+    const INIT_SPACE: usize = 1;
 }

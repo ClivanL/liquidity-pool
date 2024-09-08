@@ -8,5 +8,6 @@ pub fn handler(ctx: Context<CreateOrderBook>, token_pair:String, direction:Strin
     order_book.last_index = 0;
     order_book.token_pair = TokenPair::from_str(&token_pair)?;
     order_book.direction = Direction::from_str(&direction)?;
+    order_book.orders = Vec::new();
     Ok(())
 }

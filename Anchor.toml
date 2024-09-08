@@ -6,10 +6,10 @@ skip-lint = false
 seed = true
 
 [programs.localnet]
-multiple_tokens = "5Zw1iaBE6Wnn2ZiDoMANDvXGchyzA87hp9sJ9z1dEyMn"
+multiple_tokens = "GDckw8hMbf76mxGHLYZq2h7Fpm2XpVEwCNkMMT9uRkpe"
 
 [programs.devnet]
-multiple_tokens = "5Zw1iaBE6Wnn2ZiDoMANDvXGchyzA87hp9sJ9z1dEyMn"
+multiple_tokens = "GDckw8hMbf76mxGHLYZq2h7Fpm2XpVEwCNkMMT9uRkpe"
 
 [registry]
 url = "https://api.apr.dev"
@@ -21,3 +21,4 @@ wallet = "~/.config/solana/id.json"
 [scripts]
 test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
 test-trading = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/trading.ts"
+ 
