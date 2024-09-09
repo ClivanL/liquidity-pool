@@ -34,6 +34,16 @@ pub enum CustomError {
     InvalidTokenPair,
     #[msg("The direction does not exist.")]
     WrongDirectionInput,
+    #[msg("Different direction between order and order book.")]
+    MismatchDirection,
+    #[msg("Different token pair between order and order book.")]
+    MismatchTokenPair,
+    #[msg("SubSeed is in use.")]
+    SubSeedInUse,
+    #[msg("Order book is at max capacity.")]
+    OrderBookCapacityReached,
+    #[msg("Mismatch in token name.")]
+    MismatchTokenName
 }
 
 

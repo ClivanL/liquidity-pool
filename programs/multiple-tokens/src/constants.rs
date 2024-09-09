@@ -9,3 +9,4 @@ pub const BOOL_SIZE: usize = 1;
 pub const ENUM_SIZE: usize = 1;
 pub const LIMIT_ORDER_VECTOR_SIZE:usize = 200;
 pub const MAX_ORDERS:i32 = 15;
+pub const MAX_SUBSEED_CHAR:i32 = 6;

@@ -96,7 +96,9 @@ pub struct LimitOrder {
     pub created_at: i64,
     pub token_pair: TokenPair,
     pub closed: bool,
-    pub direction: Direction
+    pub direction: Direction,
+    #[max_len(MAX_SUBSEED_CHAR)]
+    pub sub_seed: String
 }
 
 // impl LimitOrder{

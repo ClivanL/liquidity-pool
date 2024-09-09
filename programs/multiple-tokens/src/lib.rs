@@ -72,6 +72,10 @@ pub mod multiple_tokens {
         create_order_book::handler(ctx, token_pair, direction)
     }
 
+    pub fn create_limit_order(ctx: Context<CreateLimitOrder>,direction:String, sub_seed:String, token_pair:String, quantity:f64, exchange_rate:f64) -> Result<()> {
+        create_limit_order::handler(ctx,direction,sub_seed,token_pair,quantity,exchange_rate)
+    }
+
 }
 
 

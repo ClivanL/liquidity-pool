@@ -13,6 +13,7 @@ pub mod confirm_user_stake;
 // pub mod confirm_user_stake_part_a;
 // pub mod confirm_user_stake_part_b;
 pub mod create_order_book;
+pub mod create_limit_order;
 
 pub use add_liquidity::*;
 pub use add_liquidity_v2::*;
@@ -29,5 +30,6 @@ pub use confirm_user_stake::*;
 // pub use confirm_user_stake_part_a::*;
 // pub use confirm_user_stake_part_b::*;
 pub use create_order_book::*;
+pub use create_limit_order::*;
 
 
