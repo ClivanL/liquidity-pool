@@ -6,10 +6,10 @@ skip-lint = false
 seed = true
 
 [programs.localnet]
-multiple_tokens = "GDckw8hMbf76mxGHLYZq2h7Fpm2XpVEwCNkMMT9uRkpe"
+multiple_tokens = "D7rH2nnBQXUFX2HzVCYKRLtJz2BLY2pC5Bzu25jerKFC"
 
 [programs.devnet]
-multiple_tokens = "GDckw8hMbf76mxGHLYZq2h7Fpm2XpVEwCNkMMT9uRkpe"
+multiple_tokens = "D7rH2nnBQXUFX2HzVCYKRLtJz2BLY2pC5Bzu25jerKFC"
 
 [registry]
 url = "https://api.apr.dev"

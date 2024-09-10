@@ -12,7 +12,7 @@ use anchor_lang::prelude::*;
 use instructions::*;
 use context::*;
 
-declare_id!("GDckw8hMbf76mxGHLYZq2h7Fpm2XpVEwCNkMMT9uRkpe");
+declare_id!("D7rH2nnBQXUFX2HzVCYKRLtJz2BLY2pC5Bzu25jerKFC");
 
 #[program]
 pub mod multiple_tokens {

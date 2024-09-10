@@ -119,7 +119,7 @@ describe("multiple-tokens", () => {
     const tokenEVaultAddress = await getAssociatedTokenAddress(mintE, liquidityPoolPda,true);
     const addA = new BN(5);
     const addB = new BN(0);
-    const addC = new BN(5);
+    const addC = new BN(25);
     const addD = new BN(0);
     const addE = new BN(5);
     console.log(tokenEVaultAddress);
@@ -155,7 +155,7 @@ describe("multiple-tokens", () => {
   it("Create account for user for token B!", async () => {
     // Add your test here.
     const tx = await program.methods.createAccount("token_b").accounts(
-      {userTokenVault:tokenAccountA,
+      {userTokenVault:tokenAccountB,
         user:user.publicKey
     }).signers([user]).rpc();
     console.log("Your transaction signature", tx);
@@ -170,7 +170,7 @@ describe("multiple-tokens", () => {
   it("Add liquidity to pool B, add_liquidity_v2!", async () => {
     const tokenBVaultAddress = await getAssociatedTokenAddress(mintB, liquidityPoolPda,true);
 
-    const add = new BN(10);
+    const add = new BN(25);
     const [userTokenAccountPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("token_b"),user.publicKey.toBuffer()],program.programId);
     try{
       const userTokenAccount = await program.account.userAccount.fetch(userTokenAccountPda);

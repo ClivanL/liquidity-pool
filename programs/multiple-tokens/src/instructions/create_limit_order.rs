@@ -5,7 +5,7 @@ use core::str::FromStr;
 use crate::errors::*;
 use crate::constants::*;
 use crate::state::*;
-use chrono::Utc;
+use solana_program::clock::Clock;
 
 pub fn handler(ctx: Context<CreateLimitOrder>,direction:String, sub_seed:String, token_pair:String, quantity:f64, exchange_rate:f64) -> Result<()> {
 
@@ -49,8 +49,9 @@ pub fn handler(ctx: Context<CreateLimitOrder>,direction:String, sub_seed:String,
     limit_order.user = *ctx.accounts.user.key;
     limit_order.amount_to_trade = quantity;
     limit_order.exchange_rate = exchange_rate;
-    let now = Utc::now();
-    limit_order.created_at = now.timestamp_millis();
+    let clock = Clock::get()?;
+    let current_timestamp: i64 = clock.unix_timestamp.try_into().unwrap();
+    limit_order.created_at = current_timestamp;
     limit_order.token_pair = TokenPair::from_str(&token_pair)?;
     limit_order.closed = false;
     limit_order.direction = Direction::from_str(&direction)?;
@@ -60,13 +61,14 @@ pub fn handler(ctx: Context<CreateLimitOrder>,direction:String, sub_seed:String,
         user:*ctx.accounts.user.key,
         amount_to_trade:quantity,
         exchange_rate:exchange_rate,
-        created_at:now.timestamp_millis(),
+        created_at:current_timestamp,
         token_pair:TokenPair::from_str(&token_pair)?,
         closed:false,
         direction:Direction::from_str(&direction)?,
         sub_seed:sub_seed
     };
     order_book.orders.push(limit_order_new);
+    order_book.last_index+=1;
 
     Ok(())
 }
