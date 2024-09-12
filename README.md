@@ -36,12 +36,29 @@
 - Order book
 #### Process
 ##### Buy limit order
-- Retrieve latest index from OrderBook Account (last_index, orders(Vec), direction, token-pair), seed:orderbook, `token-pair`, buy, sub_seed
+- Retrieve latest index from OrderBook Account (last_index, orders(Vec), direction, token-pair), seed:orderbook, `token-pair`, buy
 - PurchaseOrder Account created (user, amount_to_trade, exchange_rate, created_at , token_pair, closed:boolean), seed: order, buy, order+index
 ##### Sell limit order
-- Retrieve latest index from OrderBook Account (last_index, orders(Vec), direction, token-pair), seed:orderbook, `token-pair`, sell, sub_seed
+- Retrieve latest index from OrderBook Account (last_index, orders(Vec), direction, token-pair), seed:orderbook, `token-pair`, sell
 - SaleOrder Account created (user_pubkey, quantity, price, datetime,from-token, to-token, closed:boolean), seed: order, sell, order+index
-##### Processing
+##### Processing (Single order-book)
 - Retrieve OrderBook Account for purchase (Solution: clockwork)
-- Loop from first index until last index for SaleOrder, skip if closed is true, if price for saleorder < price for purchase order, fulfil order, update both orderbooks, update quantity, closed
+- Sort order book by closed, exchange_rate, created_at
+- Loop from first entry until last entry for SaleOrder, skip if closed is true, if price for saleorder < price for purchase order, fulfil order, update both orderbooks, update quantity, closed
 - Retrieve both user token accounts for both types of tokens and perform changes
+##### Processing (Multiple order-books)
+- Combine order books for sale and purchase on-chain
+- Perform sorting by closed, exchange_rate, created_at
+- Process as per single order-book logic, locate and update order books using orderbook-sub-seed that is stored in order struct 
+- **drawbacks** - computationally expensive to process combination and sorting logic on chain
+- *possible solutions* - 
+1. offchain computation
+2. Store orders in pre-defined arrangement (eg orderbooks with different exchange rates to hold orders, instead of filling up orderbook by orderbook in sequence) **TBE**
+
+##### Account management
+###### Multiple order books for same token-pair and direction (Exceed max number of orders that can be stored by a single order book)
+- Create order book directory account (orderbook-subseeds(Vec), last_index, direction, token_pair), seed: orderbook_directory, `token-pair`, `direction`
+- Introduce additional seed to orderbook account - "OB"+last_index
+- Introduce additonal seed to order account and save the additional seed in order struct (for identification of which order book the order belongs to during order processing)
+###### Closing of account after order is fulfilled
+- Close account when quantity in order account is fulfilled, logic to introduce into processing logic for orders
