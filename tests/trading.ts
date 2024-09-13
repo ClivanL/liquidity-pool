@@ -91,4 +91,19 @@ describe("trading", () => {
     expect(limitOrder.amountToTrade).to.equal(quantity);
     }
   })
+
+  it("Init sell order book directory", async()=>{
+    let token_pair = "bc";
+    let direction = "sell";
+    const [sellOrderBookDirectoryPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("orderbook_directory"), Buffer.from(token_pair), Buffer.from(direction)],program.programId);
+    const tx = await program.methods.createOrderBookDirectory(token_pair,direction).accounts({
+        orderBookDirectory:sellOrderBookDirectoryPda
+    }).rpc();
+    const sellOrderBookDirectory = await program.account.orderBookDirectory.fetch(sellOrderBookDirectoryPda);
+    expect(sellOrderBookDirectory.lastIndex).to.equal(0);
+    expect(sellOrderBookDirectory.orderbookSubseeds.length).to.equal(0);
+    console.log(sellOrderBookDirectory.direction);
+    console.log(sellOrderBookDirectory.tokenPair);
+    console.log(tx);
+  })
 })

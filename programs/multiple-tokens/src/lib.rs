@@ -76,6 +76,9 @@ pub mod multiple_tokens {
         create_limit_order::handler(ctx,direction,sub_seed,token_pair,quantity,exchange_rate)
     }
 
+    pub fn create_order_book_directory(ctx:Context<CreateOrderBookDirectory>,token_pair:String, direction:String) -> Result<()> {
+        create_order_book_directory::handler(ctx, token_pair, direction)
+    }
 }
 
 

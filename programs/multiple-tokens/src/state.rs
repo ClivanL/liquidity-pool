@@ -105,6 +105,15 @@ pub struct LimitOrder {
 //     pub const INIT_SPACE:usize = PUBKEY_SIZE + F64_SIZE + F64_SIZE + I64_SIZE + ENUM_SIZE + BOOL_SIZE + ENUM_SIZE;
 // }
 
+#[account]
+#[derive(InitSpace)]
+pub struct OrderBookDirectory {
+    pub last_index:u8,
+    pub token_pair:TokenPair,
+    pub direction:Direction,
+    #[max_len(MAX_ORDERBOOK,MAX_STRING_LENGTH)]
+    pub orderbook_subseeds: Vec<String>
+}
 
 #[account]
 #[derive(InitSpace)]
