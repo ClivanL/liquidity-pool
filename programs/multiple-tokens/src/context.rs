@@ -442,10 +442,12 @@ pub struct CreateOrderBookDirectory<'info>{
 
 
 #[derive(Accounts)]
-#[instruction(token_pair:String, direction:String)]
+#[instruction(token_pair:String, direction:String, order_book_subseed:String)]
 pub struct CreateOrderBook<'info>{
-    #[account(init, payer=initializer, seeds = [b"orderbook",token_pair.as_bytes(),direction.as_bytes()],bump, space = 8+OrderBook::INIT_SPACE)]
+    #[account(init, payer=initializer, seeds = [b"orderbook",token_pair.as_bytes(),direction.as_bytes(),order_book_subseed.as_bytes()],bump, space = 8+OrderBook::INIT_SPACE)]
     pub order_book: Account<'info,OrderBook>,
+    #[account(mut)]
+    pub order_book_directory: Account<'info,OrderBookDirectory>,
     #[account(mut)]
     pub initializer: Signer<'info>,
     pub system_program: Program<'info, System>,

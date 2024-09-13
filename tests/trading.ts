@@ -25,15 +25,53 @@ describe("trading", () => {
   const program = anchor.workspace.MultipleTokens as Program<MultipleTokens>;
   const user = getKeypairFromEnvironment("SECRET_KEY");
 
+  it("Init sell order book directory", async()=>{
+    let token_pair = "bc";
+    let direction = "sell";
+    const [sellOrderBookDirectoryPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("orderbook_directory"), Buffer.from(token_pair), Buffer.from(direction)],program.programId);
+    const tx = await program.methods.createOrderBookDirectory(token_pair,direction).accounts({
+        orderBookDirectory:sellOrderBookDirectoryPda,
+        initializer:user.publicKey
+    }).signers([user]).rpc();
+    const sellOrderBookDirectory = await program.account.orderBookDirectory.fetch(sellOrderBookDirectoryPda);
+    expect(sellOrderBookDirectory.lastIndex).to.equal(0);
+    expect(sellOrderBookDirectory.orderbookSubseeds.length).to.equal(0);
+    console.log(sellOrderBookDirectory.direction);
+    console.log(sellOrderBookDirectory.tokenPair);
+    console.log(tx);
+  })
+
+  it("Init buy order book directory", async()=>{
+    let token_pair = "bc";
+    let direction = "buy";
+    const [buyOrderBookDirectoryPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("orderbook_directory"), Buffer.from(token_pair), Buffer.from(direction)],program.programId);
+    const tx = await program.methods.createOrderBookDirectory(token_pair,direction).accounts({
+        orderBookDirectory:buyOrderBookDirectoryPda,
+        initializer:user.publicKey
+    }).signers([user]).rpc();
+    const buyOrderBookDirectory = await program.account.orderBookDirectory.fetch(buyOrderBookDirectoryPda);
+    expect(buyOrderBookDirectory.lastIndex).to.equal(0);
+    expect(buyOrderBookDirectory.orderbookSubseeds.length).to.equal(0);
+    console.log(buyOrderBookDirectory.direction);
+    console.log(buyOrderBookDirectory.tokenPair);
+    console.log(tx);
+  })
+
   it("Init buy order books", async()=>{
     try{
       let token_pair = "bc";
       let direction = "buy";
-      const [buyOrderBookPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("orderbook"), Buffer.from(token_pair), Buffer.from(direction)],program.programId);
-      const tx = await program.methods.createOrderBook(token_pair,direction).accounts({
-        orderBook:buyOrderBookPda
-      }).rpc();
-      const buyOrderBook = await program.account.orderBook.fetch(buyOrderBookPda);
+      const [buyOrderBookDirectoryPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("orderbook_directory"), Buffer.from(token_pair), Buffer.from(direction)],program.programId);
+      let buyOrderBookDirectory = await program.account.orderBookDirectory.fetch(buyOrderBookDirectoryPda);
+      console.log(buyOrderBookDirectory.lastIndex);
+      let buyOrderBookSubSeed = "OB"+buyOrderBookDirectory.lastIndex;
+      const [buyOrderBookPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("orderbook"), Buffer.from(token_pair), Buffer.from(direction),Buffer.from(buyOrderBookSubSeed)],program.programId);
+      const tx = await program.methods.createOrderBook(token_pair,direction,buyOrderBookSubSeed).accounts({
+        orderBook:buyOrderBookPda,
+        orderBookDirectory:buyOrderBookDirectoryPda,
+        initializer:user.publicKey
+      }).signers([user]).rpc();
+      let buyOrderBook = await program.account.orderBook.fetch(buyOrderBookPda);
       expect(buyOrderBook.lastIndex).to.equal(0);
       console.log(buyOrderBook.direction);
       console.log(buyOrderBook.tokenPair);
@@ -44,7 +82,7 @@ describe("trading", () => {
         const logs = await err.getLogs(provider.connection)
         console.error("Program error logs:", logs);
       } else {
-        console.error("Unexpected error:", err.getLogs(provider.connection));
+        console.error("Unexpected error:", err);
       }
     }
   })
@@ -52,10 +90,16 @@ describe("trading", () => {
   it("Init sell order books", async()=>{
     let token_pair = "bc";
     let direction = "sell";
-    const [sellOrderBookPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("orderbook"), Buffer.from(token_pair), Buffer.from(direction)],program.programId);
-    const tx = await program.methods.createOrderBook(token_pair,direction).accounts({
-        orderBook:sellOrderBookPda
-    }).rpc();
+    const [sellOrderBookDirectoryPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("orderbook_directory"), Buffer.from(token_pair), Buffer.from(direction)],program.programId);
+    let sellOrderBookDirectory = await program.account.orderBookDirectory.fetch(sellOrderBookDirectoryPda);
+    console.log(sellOrderBookDirectory.lastIndex);
+    let sellOrderBookSubSeed = "OB"+sellOrderBookDirectory.lastIndex;
+    const [sellOrderBookPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("orderbook"), Buffer.from(token_pair), Buffer.from(direction),Buffer.from(sellOrderBookSubSeed)],program.programId);
+    const tx = await program.methods.createOrderBook(token_pair,direction,sellOrderBookSubSeed).accounts({
+        orderBook:sellOrderBookPda,
+        orderBookDirectory:sellOrderBookDirectoryPda,
+        initializer:user.publicKey
+    }).signers([user]).rpc();
     const sellOrderBook = await program.account.orderBook.fetch(sellOrderBookPda);
     expect(sellOrderBook.lastIndex).to.equal(0);
     console.log(sellOrderBook.direction);
@@ -70,7 +114,12 @@ describe("trading", () => {
     const [userTokenAccountPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("token_b"),user.publicKey.toBuffer()],program.programId);
     let userTokenAccount = await program.account.userAccount.fetch(userTokenAccountPda); 
     console.log("balance:",userTokenAccount.balance);
-    const [buyOrderBookPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("orderbook"), Buffer.from(token_pair), Buffer.from(direction)],program.programId);
+    const [buyOrderBookDirectoryPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("orderbook_directory"), Buffer.from(token_pair), Buffer.from(direction)],program.programId);
+    let buyOrderBookDirectory = await program.account.orderBookDirectory.fetch(buyOrderBookDirectoryPda);
+    console.log(buyOrderBookDirectory.orderbookSubseeds);
+    let orderbook_seed = buyOrderBookDirectory.orderbookSubseeds[buyOrderBookDirectory.orderbookSubseeds.length-1];
+    console.log(orderbook_seed);
+    const [buyOrderBookPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("orderbook"), Buffer.from(token_pair), Buffer.from(direction), Buffer.from(orderbook_seed)],program.programId);
     for (let i=0;i<3;i++){
       let buyOrderBook = await program.account.orderBook.fetch(buyOrderBookPda);
       let initialOrders = buyOrderBook.orders.length;
@@ -92,18 +141,5 @@ describe("trading", () => {
     }
   })
 
-  it("Init sell order book directory", async()=>{
-    let token_pair = "bc";
-    let direction = "sell";
-    const [sellOrderBookDirectoryPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("orderbook_directory"), Buffer.from(token_pair), Buffer.from(direction)],program.programId);
-    const tx = await program.methods.createOrderBookDirectory(token_pair,direction).accounts({
-        orderBookDirectory:sellOrderBookDirectoryPda
-    }).rpc();
-    const sellOrderBookDirectory = await program.account.orderBookDirectory.fetch(sellOrderBookDirectoryPda);
-    expect(sellOrderBookDirectory.lastIndex).to.equal(0);
-    expect(sellOrderBookDirectory.orderbookSubseeds.length).to.equal(0);
-    console.log(sellOrderBookDirectory.direction);
-    console.log(sellOrderBookDirectory.tokenPair);
-    console.log(tx);
-  })
+
 })

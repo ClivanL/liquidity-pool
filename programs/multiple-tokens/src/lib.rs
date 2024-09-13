@@ -12,7 +12,7 @@ use anchor_lang::prelude::*;
 use instructions::*;
 use context::*;
 
-declare_id!("D7rH2nnBQXUFX2HzVCYKRLtJz2BLY2pC5Bzu25jerKFC");
+declare_id!("4uDbYKgb5qrd25JxqpFhvJnHcaCdJpFHyTz4NH86rAc7");
 
 #[program]
 pub mod multiple_tokens {
@@ -68,8 +68,8 @@ pub mod multiple_tokens {
     // pub fn confirm_user_stake_part_a(ctx:Context<ConfirmUserStakePartA>) -> Result<()> {
     //     confirm_user_stake_part_a::handler(ctx)
     // }
-    pub fn create_order_book(ctx:Context<CreateOrderBook>,token_pair:String, direction:String) -> Result<()> {
-        create_order_book::handler(ctx, token_pair, direction)
+    pub fn create_order_book(ctx:Context<CreateOrderBook>,token_pair:String, direction:String, order_book_subseed:String) -> Result<()> {
+        create_order_book::handler(ctx, token_pair, direction, order_book_subseed)
     }
 
     pub fn create_limit_order(ctx: Context<CreateLimitOrder>,direction:String, sub_seed:String, token_pair:String, quantity:f64, exchange_rate:f64) -> Result<()> {
