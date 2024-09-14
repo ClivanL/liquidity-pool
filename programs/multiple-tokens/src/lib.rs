@@ -12,7 +12,7 @@ use anchor_lang::prelude::*;
 use instructions::*;
 use context::*;
 
-declare_id!("4uDbYKgb5qrd25JxqpFhvJnHcaCdJpFHyTz4NH86rAc7");
+declare_id!("GqwLRbiFFcAujKPm4NchYfLRhJ6ztTtaPyMADamd6e3");
 
 #[program]
 pub mod multiple_tokens {
@@ -72,8 +72,8 @@ pub mod multiple_tokens {
         create_order_book::handler(ctx, token_pair, direction, order_book_subseed)
     }
 
-    pub fn create_limit_order(ctx: Context<CreateLimitOrder>,direction:String, sub_seed:String, token_pair:String, quantity:f64, exchange_rate:f64) -> Result<()> {
-        create_limit_order::handler(ctx,direction,sub_seed,token_pair,quantity,exchange_rate)
+    pub fn create_limit_order(ctx: Context<CreateLimitOrder>,direction:String, sub_seed:String, token_pair:String, order_book_subseed:String, quantity:f64, exchange_rate:f64) -> Result<()> {
+        create_limit_order::handler(ctx,direction,sub_seed,token_pair,order_book_subseed,quantity,exchange_rate)
     }
 
     pub fn create_order_book_directory(ctx:Context<CreateOrderBookDirectory>,token_pair:String, direction:String) -> Result<()> {

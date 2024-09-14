@@ -198,6 +198,52 @@ describe("multiple-tokens", () => {
     }
   });
 
+  it("Create account for user for token C!", async () => {
+    // Add your test here.
+    const tx = await program.methods.createAccount("token_c").accounts(
+      {userTokenVault:tokenAccountC,
+        user:user.publicKey
+    }).signers([user]).rpc();
+    console.log("Your transaction signature", tx);
+    const [userTokenAccountPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("token_c"),user.publicKey.toBuffer()],program.programId);
+    const userTokenAccount = await program.account.userAccount.fetch(userTokenAccountPda);
+    console.log(userTokenAccount.user);
+    let expectedBalance = 0;
+    let receivedBalance = userTokenAccount.balance as number;
+    expect(receivedBalance).to.equal(expectedBalance);
+  });
+
+  it("Add liquidity to pool C, add_liquidity_v2!", async () => {
+    const tokenCVaultAddress = await getAssociatedTokenAddress(mintC, liquidityPoolPda,true);
+
+    const add = new BN(25);
+    const [userTokenAccountPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("token_c"),user.publicKey.toBuffer()],program.programId);
+    try{
+      const userTokenAccount = await program.account.userAccount.fetch(userTokenAccountPda);
+      let existingBalance = userTokenAccount.balance as number;
+      const tx = await program.methods.addLiquidityV2(add).accounts(
+        {
+          userTokenAccount:userTokenAccountPda,
+          userToken:tokenAccountC,
+          tokenVault:tokenCVaultAddress,
+          user:user.publicKey,
+        }
+      ).signers([user]).rpc();
+
+      console.log("Your transaction signature", tx);
+      const updatedUserTokenAccount = await program.account.userAccount.fetch(userTokenAccountPda);
+      let newBalance = updatedUserTokenAccount.balance as number;
+      expect(newBalance).to.equal(existingBalance+add.toNumber());
+    }
+    catch (err){
+      if (err instanceof ProgramError) {
+        console.error("Program error logs:", err.logs);
+      } else {
+        console.error("Unexpected error:", err);
+      }
+    }
+  });
+
   it("Init stake records", async()=>{
     const tx = await program.methods.initStakeRecords().rpc();
     console.log(tx);

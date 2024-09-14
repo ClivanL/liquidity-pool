@@ -123,10 +123,10 @@ describe("trading", () => {
     for (let i=0;i<3;i++){
       let buyOrderBook = await program.account.orderBook.fetch(buyOrderBookPda);
       let initialOrders = buyOrderBook.orders.length;
-      let [limitOrderPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("order"),Buffer.from(direction),Buffer.from("buy_"+buyOrderBook.lastIndex),Buffer.from(token_pair)],program.programId);
+      let [limitOrderPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("order"),Buffer.from(direction),Buffer.from("buy_"+buyOrderBook.lastIndex),Buffer.from(token_pair), Buffer.from(orderbook_seed)],program.programId);
       let quantity = 1.0;
       let exchangeRate = 5.0
-      const tx = await program.methods.createLimitOrder(direction,"buy_"+buyOrderBook.lastIndex,token_pair,quantity,exchangeRate).accounts({
+      const tx = await program.methods.createLimitOrder(direction,"buy_"+buyOrderBook.lastIndex,token_pair,orderbook_seed,quantity,exchangeRate).accounts({
         limitOrder:limitOrderPda,
         orderBook:buyOrderBookPda,
         userTokenAccount:userTokenAccountPda,
@@ -134,6 +134,40 @@ describe("trading", () => {
     }).signers([user]).rpc();
     console.log(tx);
     let buyOrderBookAfter = await program.account.orderBook.fetch(buyOrderBookPda); 
+    let newOrders = buyOrderBookAfter.orders.length;
+    expect(newOrders).to.equal(initialOrders+1);
+    let limitOrder = await program.account.limitOrder.fetch(limitOrderPda);
+    expect(limitOrder.amountToTrade).to.equal(quantity);
+    }
+  })
+
+  //userTokenAccount for token_c was created and topped up in previous test case.
+  it("Init multiple sell limit order for token pair b-c", async()=>{
+    let token_pair = "bc";
+    let direction = "sell";
+    const [userTokenAccountPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("token_c"),user.publicKey.toBuffer()],program.programId);
+    let userTokenAccount = await program.account.userAccount.fetch(userTokenAccountPda); 
+    console.log("balance:",userTokenAccount.balance);
+    const [sellOrderBookDirectoryPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("orderbook_directory"), Buffer.from(token_pair), Buffer.from(direction)],program.programId);
+    let sellOrderBookDirectory = await program.account.orderBookDirectory.fetch(sellOrderBookDirectoryPda);
+    console.log(sellOrderBookDirectory.orderbookSubseeds);
+    let orderbook_seed = sellOrderBookDirectory.orderbookSubseeds[sellOrderBookDirectory.orderbookSubseeds.length-1];
+    console.log(orderbook_seed);
+    const [sellOrderBookPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("orderbook"), Buffer.from(token_pair), Buffer.from(direction), Buffer.from(orderbook_seed)],program.programId);
+    for (let i=0;i<3;i++){
+      let sellOrderBook = await program.account.orderBook.fetch(sellOrderBookPda);
+      let initialOrders = sellOrderBook.orders.length;
+      let [limitOrderPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("order"),Buffer.from(direction),Buffer.from("buy_"+sellOrderBook.lastIndex),Buffer.from(token_pair), Buffer.from(orderbook_seed)],program.programId);
+      let quantity = 1.0;
+      let exchangeRate = 5.0
+      const tx = await program.methods.createLimitOrder(direction,"buy_"+sellOrderBook.lastIndex,token_pair,orderbook_seed,quantity,exchangeRate).accounts({
+        limitOrder:limitOrderPda,
+        orderBook:sellOrderBookPda,
+        userTokenAccount:userTokenAccountPda,
+        user:user.publicKey
+    }).signers([user]).rpc();
+    console.log(tx);
+    let buyOrderBookAfter = await program.account.orderBook.fetch(sellOrderBookPda); 
     let newOrders = buyOrderBookAfter.orders.length;
     expect(newOrders).to.equal(initialOrders+1);
     let limitOrder = await program.account.limitOrder.fetch(limitOrderPda);

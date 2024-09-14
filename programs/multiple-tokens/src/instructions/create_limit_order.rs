@@ -7,7 +7,7 @@ use crate::constants::*;
 use crate::state::*;
 use solana_program::clock::Clock;
 
-pub fn handler(ctx: Context<CreateLimitOrder>,direction:String, sub_seed:String, token_pair:String, quantity:f64, exchange_rate:f64) -> Result<()> {
+pub fn handler(ctx: Context<CreateLimitOrder>,direction:String, sub_seed:String, token_pair:String, order_book_subseed:String, quantity:f64, exchange_rate:f64) -> Result<()> {
 
     let order_book = &mut ctx.accounts.order_book;
     //CHECKS
@@ -35,9 +35,17 @@ pub fn handler(ctx: Context<CreateLimitOrder>,direction:String, sub_seed:String,
         return Err(CustomError::InvalidOwner.into());
     }
     //check that user_token_account token type matches the from for token_pair
-    if String::from_utf8(user_token_account.token_name.clone()).map_err(|_| CustomError::InvalidUtf8)?!=format!("token_{}", &token_pair[0..1]){
-        return Err(CustomError::MismatchTokenName.into());
+    if Direction::from_str(&direction)?==Direction::Buy{
+        if String::from_utf8(user_token_account.token_name.clone()).map_err(|_| CustomError::InvalidUtf8)?!=format!("token_{}", &token_pair[0..1]){
+            return Err(CustomError::MismatchTokenName.into());
+        }
     }
+    else {
+        if String::from_utf8(user_token_account.token_name.clone()).map_err(|_| CustomError::InvalidUtf8)?!=format!("token_{}", &token_pair[1..2]){
+            return Err(CustomError::MismatchTokenName.into());
+        }
+    }
+
     //check that user_token_account has sufficient balance
     if user_token_account.balance < quantity{
         return Err(CustomError::InsufficientBalance.into());

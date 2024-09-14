@@ -454,9 +454,9 @@ pub struct CreateOrderBook<'info>{
 }
 
 #[derive(Accounts)]
-#[instruction(direction:String, sub_seed:String,token_pair:String)]
+#[instruction(direction:String, sub_seed:String,token_pair:String, order_book_subseed:String)]
 pub struct CreateLimitOrder<'info>{
-    #[account(init, payer=user, seeds = [b"order",direction.as_bytes(),sub_seed.as_bytes(), token_pair.as_bytes()],bump, space = 8+LimitOrder::INIT_SPACE)]
+    #[account(init, payer=user, seeds = [b"order",direction.as_bytes(),sub_seed.as_bytes(), token_pair.as_bytes(), order_book_subseed.as_bytes()],bump, space = 8+LimitOrder::INIT_SPACE)]
     pub limit_order: Account<'info,LimitOrder>,
     #[account(mut)]
     pub order_book: Account<'info,OrderBook>,
