@@ -12,3 +12,6 @@ pub const MAX_ORDERS:i32 = 15;
 pub const MAX_SUBSEED_CHAR:i32 = 6;
 pub const MAX_ORDERBOOK:i32 = 50;
 pub const MAX_STRING_LENGTH:i32 = 5;
+
+pub const MAX_TRANSFERS:i32 = 50;
+pub const MAX_PENDING_TRANSFER:i32 = 50;

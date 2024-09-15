@@ -79,6 +79,10 @@ pub mod multiple_tokens {
     pub fn create_order_book_directory(ctx:Context<CreateOrderBookDirectory>,token_pair:String, direction:String) -> Result<()> {
         create_order_book_directory::handler(ctx, token_pair, direction)
     }
+
+    pub fn create_pending_transfers_record(ctx:Context<CreatePendingTransfersRecord>) -> Result<()> {
+        create_pending_transfers_record::handler(ctx)
+    }
 }
 
 

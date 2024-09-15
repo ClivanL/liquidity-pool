@@ -129,3 +129,27 @@ pub struct OrderBook {
 //     pub const INIT_SPACE:usize = U8_SIZE + ENUM_SIZE + ENUM_SIZE + LIMIT_ORDER_VECTOR_SIZE;
 // }
 
+#[account]
+#[derive(InitSpace)]
+pub struct PendingTransfersRecord {
+    pub last_index:u8,
+    #[max_len(MAX_PENDING_TRANSFER,MAX_STRING_LENGTH)]
+    pub pending_transfer_subseeds: Vec<String>
+}
+
+#[account]
+#[derive(InitSpace)]
+pub struct PendingTransfers {
+    #[max_len(MAX_TRANSFERS)]
+    pub transfers: Vec<Transfer>
+}
+
+#[account]
+#[derive(InitSpace)]
+pub struct Transfer {
+    pub account_from: Pubkey,
+    pub account_to: Pubkey,
+    pub amount: f64,
+    #[max_len(TOKEN_NAME_SIZE)]
+    pub token_name: Vec<u8>
+}

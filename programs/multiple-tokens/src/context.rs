@@ -461,8 +461,30 @@ pub struct CreateLimitOrder<'info>{
     #[account(mut)]
     pub order_book: Account<'info,OrderBook>,
     #[account(mut)]
-    pub user: Signer<'info>,
+    pub user: Signer<'info>, //user should be the initializer
     pub system_program: Program<'info, System>,
     #[account(mut)]
     pub user_token_account: Account<'info,UserAccount>,
 }
+
+
+#[derive(Accounts)]
+pub struct CreatePendingTransfersRecord<'info>{
+    #[account(init, payer=initializer, seeds = [b"pending_transfers_record"],bump, space = 8+PendingStakeSeedRecords::INIT_SPACE)]
+    pub pending_transfers_record: Account<'info,PendingTransfersRecord>,
+    #[account(mut)]
+    pub initializer: Signer<'info>,
+    pub system_program: Program<'info, System>,
+}
+// #[derive(Accounts)]
+// pub struct ProcessBuyLimitOrder<'info>{
+//     #[account(mut)]
+//     pub limit_order: Account<'info,LimitOrder>,
+//     #[account(mut)]
+//     pub order_book: Account<'info,OrderBook>,
+//     #[account(mut)]
+//     pub user: Signer<'info>,
+//     pub system_program: Program<'info, System>,
+//     #[account(mut)]
+//     pub user_token_account: Account<'info,UserAccount>,
+// }
