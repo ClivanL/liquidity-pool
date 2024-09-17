@@ -16,6 +16,7 @@ pub mod create_order_book;
 pub mod create_limit_order;
 pub mod create_order_book_directory;
 pub mod create_pending_transfers_record;
+pub mod process_buy_limit_order;
 
 pub use add_liquidity::*;
 pub use add_liquidity_v2::*;
@@ -35,5 +36,6 @@ pub use create_order_book::*;
 pub use create_limit_order::*;
 pub use create_order_book_directory::*;
 pub use create_pending_transfers_record::*;
+pub use process_buy_limit_order::*;
 
 

@@ -1,6 +1,7 @@
 use anchor_lang::prelude::*;
 use crate::errors::*;
 use std::str::FromStr;
+use std::fmt;
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, PartialEq)]
 pub enum TokenPair {
@@ -33,6 +34,25 @@ impl FromStr for TokenPair {
             "de" => Ok(TokenPair::TokenDTokenE),
             _ => Err(CustomError::InvalidTokenPair.into())
         }
+    }
+}
+
+// Implement fmt::Display to convert TokenPair back to a string
+impl fmt::Display for TokenPair {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let s = match self {
+            TokenPair::TokenATokenB => "ab",
+            TokenPair::TokenATokenC => "ac",
+            TokenPair::TokenATokenD => "ad",
+            TokenPair::TokenATokenE => "ae",
+            TokenPair::TokenBTokenC => "bc",
+            TokenPair::TokenBTokenD => "bd",
+            TokenPair::TokenBTokenE => "be",
+            TokenPair::TokenCTokenD => "cd",
+            TokenPair::TokenCTokenE => "ce",
+            TokenPair::TokenDTokenE => "de",
+        };
+        write!(f, "{}", s)
     }
 }
 

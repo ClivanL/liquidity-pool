@@ -83,6 +83,10 @@ pub mod multiple_tokens {
     pub fn create_pending_transfers_record(ctx:Context<CreatePendingTransfersRecord>) -> Result<()> {
         create_pending_transfers_record::handler(ctx)
     }
+
+    pub fn process_buy_limit_order(ctx:Context<ProcessBuyLimitOrder>, pending_transfers_subseed:String) -> Result<()> {
+        process_buy_limit_order::handler(ctx,pending_transfers_subseed)
+    }
 }
 
 

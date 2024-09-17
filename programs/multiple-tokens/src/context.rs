@@ -476,15 +476,17 @@ pub struct CreatePendingTransfersRecord<'info>{
     pub initializer: Signer<'info>,
     pub system_program: Program<'info, System>,
 }
-// #[derive(Accounts)]
-// pub struct ProcessBuyLimitOrder<'info>{
-//     #[account(mut)]
-//     pub limit_order: Account<'info,LimitOrder>,
-//     #[account(mut)]
-//     pub order_book: Account<'info,OrderBook>,
-//     #[account(mut)]
-//     pub user: Signer<'info>,
-//     pub system_program: Program<'info, System>,
-//     #[account(mut)]
-//     pub user_token_account: Account<'info,UserAccount>,
-// }
+
+#[derive(Accounts)]
+#[instruction(pending_transfers_subseed:String)]
+pub struct ProcessBuyLimitOrder<'info>{
+    #[account(mut)]
+    pub pending_transfers_record: Account<'info,PendingTransfersRecord>,
+    #[account(init, payer=initializer, seeds = [b"pending_transfers", pending_transfers_subseed.as_bytes()],bump, space = 8+PendingStakeSeedRecords::INIT_SPACE)]
+    pub pending_transfers: Account<'info,PendingTransfers>,
+    #[account(mut)]
+    pub initializer: Signer<'info>,
+    pub system_program: Program<'info, System>,
+    #[account(mut)]
+    pub buy_limit_order: Account<'info,LimitOrder>
+}
