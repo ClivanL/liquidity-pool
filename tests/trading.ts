@@ -175,5 +175,18 @@ describe("trading", () => {
     }
   })
 
+  it("Init pending transfers record", async()=>{
+    const [pendingTransfersRecordPda] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("pending_transfers_record")],program.programId);
+    const tx = await program.methods.createPendingTransfersRecord().accounts(
+      {
+        pendingTransfersRecord:pendingTransfersRecordPda,
+        initializer:user.publicKey
+      }
+    ).signers([user]).rpc();
+    console.log(tx);
+    let pendingTransfersRecord = await program.account.pendingTransfersRecord.fetch(pendingTransfersRecordPda);
+    expect(pendingTransfersRecord.lastIndex).to.equal(0);
+  })
+
 
 })
